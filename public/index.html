@@ -316,19 +316,16 @@ setInterval(updateClock, 1000); updateClock();
 let cd = REFRESH_MS / 1000;
 setInterval(() => { cd = Math.max(0, cd - 1); document.getElementById('countdown').textContent = cd + 's'; }, 1000);
 
-// ── Weather ────────────────────────────────────────────────────────────────
-async function fetchWeather() {
+// ── Weather (served via shim to avoid CORS) ────────────────────────────────
+function renderWeather(raw) {
+  if (!raw) return;
   try {
-    const r = await fetch('https://wttr.in/Paarl,South+Africa?format=%c+%t+%h', { cache: 'no-cache' });
-    const text = (await r.text()).trim();
-    const parts = text.split(' ');
+    const parts = raw.trim().split(/\s+/);
     document.getElementById('weather-icon').textContent = parts[0] || '🌤️';
-    document.getElementById('weather-text').textContent = (parts[1] || '--') + ' ' + (parts[2] ? parts[2] + 'RH' : '');
+    document.getElementById('weather-text').textContent = parts.slice(1).join(' ');
     document.getElementById('weather-widget').style.display = 'flex';
   } catch {}
 }
-fetchWeather();
-setInterval(fetchWeather, 10 * 60000);
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function stClass(s) {
@@ -558,6 +555,9 @@ async function fetchAndRender() {
     document.getElementById('burn-bar').style.width = pct + '%';
     document.getElementById('burn-progress-pct').textContent = pct + '%';
     document.getElementById('burn-progress-wrap').style.display = 'block';
+
+    // Weather
+    renderWeather(data.weather);
 
     // Gateway
     document.getElementById('mango-status').textContent = data.gatewayReachable ? '● Online' : '● Degraded';
