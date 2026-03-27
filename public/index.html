@@ -461,29 +461,7 @@ const AGENTS = {
         const label = days === null ? 'Never used' : days === 0 ? 'Active today' : `Last: ${days}d ago`;
         const snap = data?.gregSnap;
         const updatedLine = snap?.updatedAtLabel ? `<div class="agent-updated">Snapshot: ${snap.updatedAtLabel}</div>` : '';
-        // Mini body comp sparkline
-        const weights = [{l:'May 25',v:78.5},{l:'Nov 25',v:77.1},{l:'Feb 26',v:75.5}];
-        const bfs = [{l:'May 25',v:12.5},{l:'Nov 25',v:11.6},{l:'Feb 26',v:11.4}];
-        const sparkline = (pts, color, min, max) => {
-          const w=80,h=22,pad=2;
-          const xStep=(w-pad*2)/(pts.length-1);
-          const yScale=v=>h-pad-((v-min)/(max-min))*(h-pad*2);
-          let d=pts.map((p,i)=>`${i===0?'M':'L'}${(pad+i*xStep).toFixed(1)},${yScale(p.v).toFixed(1)}`).join(' ');
-          return `<svg width="${w}" height="${h}" style="overflow:visible"><polyline points="${pts.map((p,i)=>`${pad+i*xStep},${yScale(p.v)}`).join(' ')}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>${pts.map((p,i)=>`<circle cx="${pad+i*xStep}" cy="${yScale(p.v)}" r="2" fill="${color}"/>`).join('')}</svg>`;
-        };
-        return `<div class="agent-status-row"><span class="tag tag-${cls}">${label}</span></div>
-          <div style="display:flex;gap:14px;margin-top:7px;align-items:center">
-            <div style="display:flex;flex-direction:column;gap:1px">
-              <div style="font-size:9px;color:var(--text3)">Weight</div>
-              ${sparkline(weights,'#3ddc84',74,80)}
-              <div style="font-size:9px;color:var(--text3)">75.5kg ↓</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:1px">
-              <div style="font-size:9px;color:var(--text3)">Body Fat</div>
-              ${sparkline(bfs,'#7c6af7',10,14)}
-              <div style="font-size:9px;color:var(--text3)">11.4% ↓</div>
-            </div>
-          </div>${updatedLine}`;
+        return `<div class="agent-status-row"><span class="tag tag-${cls}">${label}</span></div>${updatedLine}`;
       }
     },
     {
