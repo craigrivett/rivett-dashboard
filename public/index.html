@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rivett Command Centre</title>
+  <style>
+    :root {
+      --bg: #080810;
+      --surface: #0f0f1a;
+      --surface2: #14141f;
+      --surface3: #1a1a28;
+      --border: #1e1e30;
+      --border2: #252538;
+      --accent: #7c6af7;
+      --accent2: #4fc3f7;
+      --green: #3ddc84;
+      --amber: #f9a825;
+      --red: #ff5252;
+      --muted: #3a3a55;
+      --text: #dcdcf0;
+      --text2: #7878a0;
+      --text3: #4a4a6a;
+      --family: #f472b6;
+      --work: #60a5fa;
+      --burn: #ff7043;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'SF Pro Display', 'Inter', 'Segoe UI', system-ui, sans-serif;
+      display: grid;
+      grid-template-rows: 60px 1fr 44px;
+      grid-template-columns: 1fr 300px;
+      height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      grid-column: 1 / -1;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .h-left { display: flex; align-items: center; gap: 14px; }
+    .h-title { font-size: 16px; font-weight: 700; letter-spacing: 0.04em; color: var(--text); }
+    .h-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
+    .h-right { display: flex; align-items: center; gap: 20px; }
+    .burn-badge {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,112,67,0.1); border: 1px solid rgba(255,112,67,0.25);
+      border-radius: 20px; padding: 4px 12px;
+    }
+    .burn-fire { font-size: 16px; animation: flicker 2s infinite alternate; }
+    @keyframes flicker { 0% { opacity: 1; } 100% { opacity: 0.7; transform: scale(0.95); } }
+    .burn-text { font-size: 12px; font-weight: 600; color: var(--burn); }
+    .clock { font-size: 20px; font-weight: 300; font-variant-numeric: tabular-nums; color: var(--text); }
+    .refresh-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text2); }
+    .pulse-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ── MAIN ── */
+    main {
+      grid-column: 1; padding: 20px 16px 16px 24px;
+      display: flex; flex-direction: column; gap: 16px; overflow: hidden;
+    }
+
+    /* CEO row */
+    .ceo-row { display: flex; justify-content: center; }
+    .agent-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 11px 14px;
+      display: flex; align-items: flex-start; gap: 11px;
+      transition: border-color 0.2s;
+    }
+    .agent-card:hover { border-color: var(--border2); }
+    .agent-card.ceo {
+      background: linear-gradient(135deg, #1a1535 0%, #0f0f1a 100%);
+      border-color: var(--accent); padding: 14px 22px; min-width: 300px;
+    }
+    .agent-emoji { font-size: 26px; line-height: 1; flex-shrink: 0; }
+    .agent-card.ceo .agent-emoji { font-size: 36px; }
+    .agent-info { flex: 1; min-width: 0; }
+    .agent-name { font-size: 14px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .agent-card.ceo .agent-name { font-size: 19px; }
+    .agent-role { font-size: 10px; color: var(--text2); margin-top: 2px; }
+    .agent-meta { margin-top: 7px; display: flex; flex-wrap: wrap; gap: 5px; }
+    .tag { font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 500; letter-spacing: 0.02em; white-space: nowrap; }
+    .tag-ok    { background: rgba(61,220,132,0.1); color: var(--green); border: 1px solid rgba(61,220,132,0.2); }
+    .tag-warn  { background: rgba(249,168,37,0.1); color: var(--amber); border: 1px solid rgba(249,168,37,0.2); }
+    .tag-error { background: rgba(255,82,82,0.1);  color: var(--red);   border: 1px solid rgba(255,82,82,0.2); }
+    .tag-idle  { background: rgba(58,58,85,0.4);   color: var(--text2); border: 1px solid var(--border); }
+    .tag-accent{ background: rgba(124,106,247,0.1);color: var(--accent);border: 1px solid rgba(124,106,247,0.2); }
+    .agent-crons { margin-top: 7px; display: flex; flex-direction: column; gap: 4px; }
+    .cron-item { font-size: 10px; color: var(--text2); display: flex; align-items: center; gap: 6px; }
+    .cron-item .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .dot-ok    { background: var(--green); }
+    .dot-warn  { background: var(--amber); }
+    .dot-error { background: var(--red); }
+    .dot-idle  { background: var(--muted); }
+    .cron-next { margin-left: auto; color: var(--text3); font-size: 9px; }
+
+    .connector { display: flex; justify-content: center; color: var(--muted); font-size: 16px; line-height: 0.6; margin: 2px 0; }
+
+    /* Divisions */
+    .divisions { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; overflow: hidden; }
+    .division { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
+    .div-header { padding: 12px 16px 8px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .div-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+    .div-title.family { color: var(--family); }
+    .div-title.work   { color: var(--work); }
+    .div-agents { flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 9px; overflow-y: auto; }
+
+    /* Dory stats */
+    .dory-stats { display: flex; gap: 6px; margin-top: 6px; }
+    .stat-pill { background: var(--surface3); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 10px; color: var(--text2); display: flex; flex-direction: column; align-items: center; min-width: 48px; }
+    .stat-num { font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.1; }
+
+    /* ── SIDEBAR ── */
+    aside {
+      grid-column: 2; border-left: 1px solid var(--border); background: var(--surface);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .aside-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text2); }
+    .cron-list { flex: 1; overflow-y: auto; }
+    .cron-group { padding: 0 14px 4px; }
+    .cron-group-label { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; padding: 8px 0 4px; }
+    .cron-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(30,30,48,0.7); }
+    .cron-row:last-child { border-bottom: none; }
+    .cron-status { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .cron-details { flex: 1; min-width: 0; }
+    .cron-name { font-size: 10px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cron-sched { font-size: 9px; color: var(--text2); margin-top: 1px; }
+    .cron-last { font-size: 9px; color: var(--text2); flex-shrink: 0; text-align: right; }
+    .cron-next-time { font-size: 9px; color: var(--text3); text-align: right; margin-top: 1px; }
+
+    /* ── FOOTER ── */
+    footer {
+      grid-column: 1 / -1; background: var(--surface); border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
+    }
+    .sys-items { display: flex; align-items: center; gap: 20px; }
+    .sys-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text2); }
+    .sys-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .sys-dot.ok    { background: var(--green); }
+    .sys-dot.warn  { background: var(--amber); }
+    .sys-dot.error { background: var(--red); box-shadow: 0 0 6px var(--red); }
+    .sys-dot.idle  { background: var(--muted); }
+    .footer-right { font-size: 9px; color: var(--text3); }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+    .loading { color: var(--text2); font-size: 11px; padding: 16px; text-align: center; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="h-left">
+    <div>
+      <div class="h-title">🥭 Rivett Command Centre</div>
+      <div class="h-sub">Live agent & automation view</div>
+    </div>
+  </div>
+  <div class="h-right">
+    <div class="burn-badge">
+      <span class="burn-fire">🔥</span>
+      <span class="burn-text" id="burn-count">-- days to Afrika Burn</span>
+    </div>
+    <div class="refresh-badge">
+      <div class="pulse-dot"></div>
+      <span id="countdown">60s</span>
+    </div>
+    <div class="clock" id="clock">--:--:-- SAST</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+  <div class="ceo-row">
+    <div class="agent-card ceo">
+      <div class="agent-emoji">🥭</div>
+      <div class="agent-info">
+        <div class="agent-name">Mango <span class="tag tag-accent">CEO</span> <span class="tag tag-ok" id="mango-status">● Online</span></div>
+        <div class="agent-role">Personal AI — family ops, email, calendar, orchestration</div>
+        <div class="agent-meta">
+          <span class="tag tag-idle">WhatsApp</span>
+          <span class="tag tag-idle">Telegram</span>
+          <span class="tag tag-idle">claude-sonnet-4-6</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="connector">│</div>
+  <div class="divisions">
+    <div class="division">
+      <div class="div-header"><span>🏠</span><span class="div-title family">Family</span></div>
+      <div class="div-agents" id="family-agents"><div class="loading">Loading…</div></div>
+    </div>
+    <div class="division">
+      <div class="div-header"><span>💼</span><span class="div-title work">Work</span></div>
+      <div class="div-agents" id="work-agents"><div class="loading">Loading…</div></div>
+    </div>
+  </div>
+</main>
+
+<!-- SIDEBAR -->
+<aside>
+  <div class="aside-header">Mango's Cron Jobs</div>
+  <div class="cron-list" id="cron-list"><div class="loading">Loading…</div></div>
+</aside>
+
+<!-- FOOTER -->
+<footer>
+  <div class="sys-items" id="sys-items">
+    <div class="sys-item"><div class="sys-dot idle"></div><span>Loading…</span></div>
+  </div>
+  <div class="footer-right" id="footer-right">Never updated</div>
+</footer>
+
+<script>
+const REFRESH_MS = 60000;
+const AFRICA_BURN = new Date('2026-04-27T00:00:00+02:00');
+
+// ── Clock ──────────────────────────────────────────────────────────────────
+function updateClock() {
+  const sast = new Date(Date.now() + 2 * 3600000);
+  document.getElementById('clock').textContent =
+    [sast.getUTCHours(), sast.getUTCMinutes(), sast.getUTCSeconds()]
+      .map(n => String(n).padStart(2,'0')).join(':') + ' SAST';
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ── Countdown ──────────────────────────────────────────────────────────────
+let cd = REFRESH_MS / 1000;
+setInterval(() => { cd = Math.max(0, cd - 1); document.getElementById('countdown').textContent = cd + 's'; }, 1000);
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function stClass(s) {
+  if (!s || s === 'idle' || s === 'never') return 'idle';
+  if (s === 'ok') return 'ok';
+  if (s === 'skipped') return 'warn';
+  return 'error';
+}
+function rel(ms) {
+  if (!ms) return '—';
+  const d = Date.now() - ms;
+  const m = Math.floor(d / 60000), h = Math.floor(m / 60), dy = Math.floor(h / 24);
+  if (dy > 0) return dy + 'd ago';
+  if (h > 0) return h + 'h ago';
+  if (m > 0) return m + 'm ago';
+  return 'just now';
+}
+function relNext(ms) {
+  if (!ms) return '';
+  const d = ms - Date.now();
+  if (d < 0) return 'overdue';
+  const m = Math.floor(d / 60000), h = Math.floor(m / 60);
+  if (h > 0) return 'in ' + h + 'h ' + (m % 60) + 'm';
+  if (m > 0) return 'in ' + m + 'm';
+  return 'soon';
+}
+function sched(expr, tz) {
+  const map = {
+    '0 5 * * *':'Daily 5am','30 5 * * *':'Daily 5:30am','15 6 * * *':'Daily 6:15am',
+    '0 7 * * *':'Daily 7am','0 8 * * *':'Daily 8am','0 12 * * *':'Daily 12pm',
+    '0 14 * * *':'Daily 2pm','10 */12 * * *':'Every 12h','15 */12 * * *':'Every 12h',
+    '0 0 * * 0':'Sun midnight','0 9 * * 1':'Mon 9am','5 9 * * 1':'Mon 9:05am',
+    '0 8 1 * *':'1st 8am','0 10 1 * *':'1st 10am','30 10 1 * *':'1st 10:30am',
+    '0 12 1 * *':'1st 12pm',
+  };
+  const label = map[expr] || expr;
+  return label + (tz ? ' ' + tz.replace('Africa/','') : '');
+}
+const NAMES = {
+  'daily-brief':'Daily Brief','Daily Mango Improvement Task':'Self-Improvement',
+  'daily-5min-performance-prompt':'Performance Prompt','daily-email-cleanup-drafts':'Email Cleanup',
+  'daily-memory-template-maker':'Memory Template','daily-memory-gap-report':'Memory Gap Report',
+  'm365-auth-keepalive':'M365 Auth Keepalive','cron-delivery-watchdog':'Delivery Watchdog',
+  'healthcheck:auto-update':'Auto-Update','healthcheck:security-audit':'Security Audit',
+  'healthcheck:update-status':'Version Check','dory-monthly-filing':'Dory Monthly Filing',
+  'Monthly Investec Statement Processor':'Investec Statements',
+  'monthly-bank-statements-pipeline':'Bank Statements',
+  'Monthly Agent Security Scan (Snyk Agent Scan)':'Security Scan',
+  'Angus — Morning Run':'Angus Morning','Angus — Afternoon Run':'Angus Afternoon',
+};
+
+// ── Agent cron lookup ──────────────────────────────────────────────────────
+function getCrons(jobs, ids) {
+  return ids.map(id => jobs.find(j => j.name === id || j.id === id)).filter(Boolean);
+}
+
+function cronItemsHtml(crons) {
+  if (!crons.length) return '';
+  return '<div class="agent-crons">' + crons.map(j => {
+    const st = j.state?.lastRunStatus || 'idle';
+    const cls = stClass(st);
+    const next = relNext(j.state?.nextRunAtMs);
+    return `<div class="cron-item">
+      <div class="dot dot-${cls}"></div>
+      <span>${sched(j.schedule?.expr, j.schedule?.tz)}</span>
+      <span class="cron-next">${next}</span>
+    </div>`;
+  }).join('') + '</div>';
+}
+
+// ── Agent definitions ──────────────────────────────────────────────────────
+const AGENTS = {
+  family: [
+    {
+      emoji:'🐠', name:'Dory', role:'Family document filing & expiry tracking',
+      cronIds:['dory-monthly-filing'],
+      tags:[{l:'OneDrive',c:'idle'},{l:'Monthly',c:'idle'}],
+      extra: (data) => {
+        const docs = data?.dory || {};
+        return `<div class="dory-stats">
+          <div class="stat-pill"><div class="stat-num">${docs.idPassports||'—'}</div><div>IDs</div></div>
+          <div class="stat-pill"><div class="stat-num">${docs.births||'—'}</div><div>Births</div></div>
+          <div class="stat-pill"><div class="stat-num">${docs.schoolReports||'—'}</div><div>Reports</div></div>
+          <div class="stat-pill"><div class="stat-num">${docs.legal||'—'}</div><div>Legal</div></div>
+        </div>`;
+      }
+    },
+    { emoji:'💪', name:'Greg', role:'Health & longevity — biometrics, Garmin, blood work', cronIds:[], tags:[{l:'Health',c:'idle'},{l:'On demand',c:'idle'}] },
+    { emoji:'🎯', name:'Coach', role:'Founder performance coach — weekly challenges & reviews', cronIds:[], tags:[{l:'Mon/Fri cadence',c:'idle'}] },
+  ],
+  work: [
+    {
+      emoji:'🤖', name:'Angus', role:'GritCargo accounts clerk — invoice filing & Sheets',
+      cronIds:['Angus — Morning Run','Angus — Afternoon Run'],
+      tags:[{l:'GritCargo',c:'idle'},{l:'2× daily',c:'idle'}]
+    },
+  ]
+};
+
+function buildCard(agent, jobs, extraData) {
+  const crons = getCrons(jobs, agent.cronIds);
+  const tagsHtml = agent.tags.map(t => `<span class="tag tag-${t.c}">${t.l}</span>`).join('');
+  const extra = agent.extra ? agent.extra(extraData) : '';
+  return `<div class="agent-card">
+    <div class="agent-emoji">${agent.emoji}</div>
+    <div class="agent-info">
+      <div class="agent-name">${agent.name}</div>
+      <div class="agent-role">${agent.role}</div>
+      <div class="agent-meta">${tagsHtml}</div>
+      ${extra}
+      ${cronItemsHtml(crons)}
+    </div>
+  </div>`;
+}
+
+// ── Sidebar cron groups ────────────────────────────────────────────────────
+const CRON_GROUPS = [
+  { label:'Daily', ids:['daily-brief','Daily Mango Improvement Task','daily-5min-performance-prompt','daily-email-cleanup-drafts','daily-memory-template-maker','daily-memory-gap-report'] },
+  { label:'Health & Infra', ids:['m365-auth-keepalive','cron-delivery-watchdog'] },
+  { label:'Weekly', ids:['healthcheck:auto-update','healthcheck:security-audit','healthcheck:update-status'] },
+  { label:'Monthly', ids:['Monthly Investec Statement Processor','monthly-bank-statements-pipeline','Monthly Agent Security Scan (Snyk Agent Scan)','dory-monthly-filing'] },
+];
+
+function buildSidebar(jobs) {
+  return CRON_GROUPS.map(g => {
+    const rows = g.ids.map(id => jobs.find(j => j.name === id || j.id === id)).filter(Boolean);
+    if (!rows.length) return '';
+    return `<div class="cron-group">
+      <div class="cron-group-label">${g.label}</div>
+      ${rows.map(j => {
+        const st = j.state?.lastRunStatus || 'idle';
+        const cls = stClass(st);
+        const name = NAMES[j.name] || j.name;
+        return `<div class="cron-row">
+          <div class="cron-status sys-dot ${cls}"></div>
+          <div class="cron-details">
+            <div class="cron-name">${name}</div>
+            <div class="cron-sched">${sched(j.schedule?.expr, j.schedule?.tz)}</div>
+          </div>
+          <div>
+            <div class="cron-last">${rel(j.state?.lastRunAtMs)}</div>
+            <div class="cron-next-time">${relNext(j.state?.nextRunAtMs)}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+// ── Footer ─────────────────────────────────────────────────────────────────
+function buildFooter(data) {
+  const items = [
+    { label: 'Gateway', st: data.gatewayReachable ? 'ok' : 'error', text: data.gatewayReachable ? 'Connected' : 'Unreachable' },
+    { label: 'WhatsApp', st: 'ok', text: 'Connected' },
+    { label: 'M365', st: 'idle', text: 'Auth active' },
+    { label: 'OpenClaw', st: 'ok', text: '2026.3.23-2' },
+  ];
+  return items.map(i => `<div class="sys-item"><div class="sys-dot ${i.st}"></div><span>${i.label}: ${i.text}</span></div>`).join('');
+}
+
+// ── Dory doc counts ────────────────────────────────────────────────────────
+// Static counts from last known state — updated by Dory's monthly run
+const DORY_COUNTS = { idPassports: 11, births: 1, schoolReports: 10, legal: 1 };
+
+// ── Fetch & render ─────────────────────────────────────────────────────────
+async function fetchAndRender() {
+  try {
+    const res = await fetch('/api/data?t=' + Date.now());
+    const data = await res.json();
+    const jobs = data.cron?.jobs || [];
+
+    // Afrika Burn countdown
+    const days = data.afrikaburn?.daysRemaining ?? Math.ceil((AFRICA_BURN - new Date()) / 86400000);
+    document.getElementById('burn-count').textContent = days > 0 ? `${days} days to Afrika Burn` : '🎉 Afrika Burn!';
+
+    // Gateway status
+    document.getElementById('mango-status').textContent = data.gatewayReachable ? '● Online' : '● Degraded';
+    document.getElementById('mango-status').className = 'tag ' + (data.gatewayReachable ? 'tag-ok' : 'tag-warn');
+
+    // Agent cards
+    const extraData = { dory: DORY_COUNTS };
+    document.getElementById('family-agents').innerHTML = AGENTS.family.map(a => buildCard(a, jobs, extraData)).join('');
+    document.getElementById('work-agents').innerHTML = AGENTS.work.map(a => buildCard(a, jobs, extraData)).join('');
+
+    // Sidebar
+    document.getElementById('cron-list').innerHTML = buildSidebar(jobs) || '<div class="loading">No data</div>';
+
+    // Footer
+    document.getElementById('sys-items').innerHTML = buildFooter(data);
+    document.getElementById('footer-right').textContent = 'Updated ' + new Date().toLocaleTimeString('en-ZA', { timeZone: 'Africa/Johannesburg' });
+
+    cd = REFRESH_MS / 1000;
+  } catch(e) {
+    document.getElementById('footer-right').textContent = 'Update failed — retrying…';
+  }
+}
+
+fetchAndRender();
+setInterval(fetchAndRender, REFRESH_MS);
+</script>
+</body>
+</html>
