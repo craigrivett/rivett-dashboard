@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Coach — Founder Snapshot</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+  <link rel="manifest" href="/manifest.json"/>
+  <style>
+    [data-theme="dark"]{--bg:#080810;--surface:#0f0f1a;--surface2:#14141f;--surface3:#1a1a28;--border:#1e1e30;--border2:#252538;--accent:#7c6af7;--green:#3ddc84;--amber:#f9a825;--red:#ff5252;--muted:#3a3a55;--text:#dcdcf0;--text2:#7878a0;--text3:#4a4a6a;}
+    [data-theme="light"]{--bg:#f4f4f8;--surface:#fff;--surface2:#f0f0f5;--surface3:#e8e8f0;--border:#dcdce8;--border2:#c8c8d8;--accent:#6654e8;--green:#16a34a;--amber:#d97706;--red:#dc2626;--muted:#9090b0;--text:#1a1a2e;--text2:#606080;--text3:#a0a0b8;}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;min-height:100vh;}
+    header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+    .h-back{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text2);font-size:13px;transition:color 0.2s;}
+    .h-back:hover{color:var(--accent);}
+    .h-title{font-size:15px;font-weight:700;}
+    .theme-btn{background:none;border:1px solid var(--border2);border-radius:8px;color:var(--text2);padding:4px 8px;cursor:pointer;font-size:13px;}
+    .page{max-width:860px;margin:0 auto;padding:24px 20px 48px;}
+    .data-as-of{font-size:11px;color:var(--text3);margin-bottom:20px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;}
+    .section{margin-bottom:28px;}
+    .section-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+    .badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+    .badge-ok{background:rgba(61,220,132,0.1);color:var(--green);border:1px solid rgba(61,220,132,0.2);}
+    .badge-warn{background:rgba(249,168,37,0.1);color:var(--amber);border:1px solid rgba(249,168,37,0.2);}
+    .badge-idle{background:rgba(58,58,85,0.3);color:var(--text2);border:1px solid var(--border);}
+    .badge-accent{background:rgba(124,106,247,0.1);color:var(--accent);border:1px solid rgba(124,106,247,0.2);}
+    /* Cadence */
+    .cadence-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+    .cadence-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
+    .cadence-day{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text2);margin-bottom:6px;}
+    .cadence-title{font-size:14px;font-weight:600;margin-bottom:8px;}
+    .cadence-body{font-size:12px;color:var(--text2);line-height:1.5;}
+    .cadence-card.active{border-color:var(--accent);}
+    /* Profile */
+    .profile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+    .profile-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+    .profile-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:4px;}
+    .profile-value{font-size:13px;color:var(--text);}
+    /* Anti-patterns */
+    .ap-list{display:flex;flex-direction:column;gap:8px;}
+    .ap-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:flex-start;gap:12px;}
+    .ap-row.flagged{border-color:var(--amber);}
+    .ap-icon{font-size:18px;flex-shrink:0;}
+    .ap-name{font-size:13px;font-weight:600;margin-bottom:2px;}
+    .ap-desc{font-size:11px;color:var(--text2);line-height:1.4;}
+    /* Mental models */
+    .mm-table{width:100%;border-collapse:collapse;}
+    .mm-table th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);padding:6px 10px;border-bottom:1px solid var(--border);text-align:left;}
+    .mm-table td{padding:8px 10px;font-size:12px;border-bottom:1px solid var(--border);}
+    .mm-table tr:last-child td{border-bottom:none;}
+    .mm-table tr:hover td{background:var(--surface2);}
+    /* Companies */
+    .company-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .company-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+    .company-name{font-size:14px;font-weight:700;margin-bottom:4px;}
+    .company-desc{font-size:11px;color:var(--text2);line-height:1.5;}
+    @media(max-width:600px){header{padding:0 14px;}.page{padding:16px 12px 32px;}.cadence-grid,.company-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<header>
+  <a class="h-back" href="/">← Back</a>
+  <div class="h-title">🎯 Coach — Founder Snapshot</div>
+  <button class="theme-btn" id="theme-btn">☀️</button>
+</header>
+<div class="page">
+  <div class="data-as-of" id="data-as-of">📅 Last session: 27 Mar 2026 · Next: Mon challenge</div>
+
+  <!-- Weekly cadence -->
+  <div class="section">
+    <div class="section-title"><span>📅</span> This Week's Cadence</div>
+    <div class="cadence-grid">
+      <div class="cadence-card" id="monday-card">
+        <div class="cadence-day">Monday</div>
+        <div class="cadence-title">Weekly Challenge</div>
+        <div class="cadence-body" id="monday-body">No challenge set yet this week. Coach will send one Monday morning SAST.</div>
+        <div style="margin-top:10px" id="monday-status"><span class="badge badge-warn">Pending</span></div>
+      </div>
+      <div class="cadence-card" id="friday-card">
+        <div class="cadence-day">Friday</div>
+        <div class="cadence-title">Week Review</div>
+        <div class="cadence-body" id="friday-body">What landed, what didn't, what the pattern is.</div>
+        <div style="margin-top:10px" id="friday-status"><span class="badge badge-idle">Not due yet</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Companies -->
+  <div class="section">
+    <div class="section-title"><span>🏢</span> Companies</div>
+    <div class="company-grid">
+      <div class="company-card">
+        <div class="company-name">GritCargo</div>
+        <div style="margin-bottom:6px"><span class="badge badge-accent">Primary</span></div>
+        <div class="company-desc">Freight & logistics — disruptive AI ecosystem built around hardware, proprietary data and social network. $9–10T industry. Products: Lock, Light, Dashboard, Control, Sense.</div>
+      </div>
+      <div class="company-card">
+        <div class="company-name">GritClaw</div>
+        <div style="margin-bottom:6px"><span class="badge badge-accent">AI Spinoff</span></div>
+        <div class="company-desc">"OpenClaw for logistics." Connects to GritCargo data — flags risks early, resolves exceptions, handles compliance, KPI reporting, route audits. Works continuously in background.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Founder profile -->
+  <div class="section">
+    <div class="section-title"><span>👤</span> Founder Profile</div>
+    <div class="profile-grid">
+      <div class="profile-item"><div class="profile-label">Stage</div><div class="profile-value">Early-to-growth</div></div>
+      <div class="profile-item"><div class="profile-label">Biggest blocker</div><div class="profile-value">Thinking clearly & staying focused</div></div>
+      <div class="profile-item"><div class="profile-label">Style</div><div class="profile-value">Direct, no fluff, short</div></div>
+      <div class="profile-item"><div class="profile-label">Cadence</div><div class="profile-value">Mon challenge · Fri review</div></div>
+      <div class="profile-item"><div class="profile-label">PMF Stage</div><div class="profile-value" style="color:var(--text2)">Being assessed</div></div>
+      <div class="profile-item"><div class="profile-label">Sessions logged</div><div class="profile-value" id="session-count">—</div></div>
+    </div>
+  </div>
+
+  <!-- Anti-patterns -->
+  <div class="section">
+    <div class="section-title"><span>⚠️</span> Anti-Patterns to Watch</div>
+    <div class="ap-list">
+      <div class="ap-row"><div class="ap-icon">🔄</div><div><div class="ap-name">Excuse thinking</div><div class="ap-desc">Externalising blame — looking outward for reasons instead of inward for solutions</div></div><div style="margin-left:auto"><span class="badge badge-idle">Monitor</span></div></div>
+      <div class="ap-row"><div class="ap-icon">😰</div><div><div class="ap-name">Fear-driven decisions</div><div class="ap-desc">Avoidance disguised as strategy — choosing the safe path over the right one</div></div><div style="margin-left:auto"><span class="badge badge-idle">Monitor</span></div></div>
+      <div class="ap-row"><div class="ap-icon">🔒</div><div><div class="ap-name">Founder trap</div><div class="ap-desc">Can't delegate, can't let go — everything flows through Craig</div></div><div style="margin-left:auto"><span class="badge badge-idle">Monitor</span></div></div>
+      <div class="ap-row"><div class="ap-icon">⏳</div><div><div class="ap-name">Perfectionism</div><div class="ap-desc">Delay disguised as preparation — waiting for the right moment that never comes</div></div><div style="margin-left:auto"><span class="badge badge-idle">Monitor</span></div></div>
+      <div class="ap-row"><div class="ap-icon">🌪️</div><div><div class="ap-name">Priority chaos</div><div class="ap-desc">Busy but not moving the needle — self-identified as primary blocker</div></div><div style="margin-left:auto"><span class="badge badge-warn">⚠ Flagged</span></div></div>
+      <div class="ap-row"><div class="ap-icon">🛋️</div><div><div class="ap-name">Comfort zone</div><div class="ap-desc">Doing what's easy instead of what matters — defaulting to familiar tasks</div></div><div style="margin-left:auto"><span class="badge badge-idle">Monitor</span></div></div>
+    </div>
+  </div>
+
+  <!-- Mental models -->
+  <div class="section">
+    <div class="section-title"><span>🧠</span> Mental Model Progress</div>
+    <div class="chart-wrap" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <table class="mm-table">
+        <thead><tr><th>Model</th><th>Status</th><th>Last Applied</th></tr></thead>
+        <tbody>
+          <tr><td>4Ps Framework</td><td><span class="badge badge-idle">Not started</span></td><td style="color:var(--text3)">—</td></tr>
+          <tr><td>NFX 11 of 13</td><td><span class="badge badge-idle">Not started</span></td><td style="color:var(--text3)">—</td></tr>
+          <tr><td>White-Hot Center</td><td><span class="badge badge-idle">Not started</span></td><td style="color:var(--text3)">—</td></tr>
+          <tr><td>PMF Levels</td><td><span class="badge badge-idle">Not started</span></td><td style="color:var(--text3)">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:8px">Mental model progress builds over coaching sessions. Track application in weekly challenges.</div>
+  </div>
+</div>
+<script>
+let theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+document.documentElement.setAttribute('data-theme', theme);
+document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+document.getElementById('theme-btn').addEventListener('click', () => {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('theme', theme);
+});
+
+// Count session memory files
+async function loadCoachData() {
+  try {
+    const r = await fetch('/api/data?t=' + Date.now());
+    const d = await r.json();
+    const coach = d.agents?.coach;
+    if (!coach) return;
+    if (coach.daysSinceActive !== null) {
+      const label = coach.daysSinceActive === 0 ? 'Active today' : `${coach.daysSinceActive}d ago`;
+      document.getElementById('data-as-of').textContent = `📅 Last session: ${label} · Week ${new Date().toLocaleDateString('en-ZA',{weekday:'long'})} cadence`;
+    }
+    if (coach.weeklyChallenge === 'set') {
+      document.getElementById('monday-status').innerHTML = '<span class="badge badge-ok">✓ Set</span>';
+      document.getElementById('monday-card').classList.add('active');
+    }
+    if (coach.weeklyReview === 'done') {
+      document.getElementById('friday-status').innerHTML = '<span class="badge badge-ok">✓ Done</span>';
+    } else if (coach.weeklyReview === 'pending') {
+      document.getElementById('friday-status').innerHTML = '<span class="badge badge-warn">Pending</span>';
+      document.getElementById('friday-card').classList.add('active');
+    }
+    if (coach.sessionCount) document.getElementById('session-count').textContent = coach.sessionCount;
+  } catch {}
+}
+loadCoachData();
+</script>
+</body>
+</html>

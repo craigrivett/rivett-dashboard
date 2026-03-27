@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rivett Command Centre</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Command" />
+  <meta name="theme-color" content="#0f0f1a" />
   <style>
     /* ── THEMES ── */
     [data-theme="dark"] {
@@ -50,8 +55,22 @@
     .burn-badge {
       display: flex; align-items: center; gap: 6px;
       background: rgba(255,112,67,0.1); border: 1px solid rgba(255,112,67,0.25);
-      border-radius: 20px; padding: 4px 12px; cursor: default;
+      border-radius: 20px; padding: 4px 12px; cursor: pointer;
+      text-decoration: none;
     }
+    .burn-badge:hover { border-color: rgba(255,112,67,0.5); }
+    /* Notification dot */
+    .agent-card-wrap { position: relative; }
+    .notif-dot {
+      position: absolute; top: -4px; right: -4px;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--red); border: 2px solid var(--bg);
+      z-index: 2; display: none;
+    }
+    .notif-dot.warn { background: var(--amber); }
+    .notif-dot.show { display: block; }
+    /* Agent last-updated label */
+    .agent-updated { font-size: 9px; color: var(--text3); margin-top: 5px; }
     .burn-fire { font-size: 15px; animation: flicker 2s infinite alternate; }
     @keyframes flicker { 0%{opacity:1} 100%{opacity:0.65;transform:scale(0.95)} }
     .burn-text { font-size: 12px; font-weight: 600; color: var(--burn); }
@@ -228,10 +247,10 @@
       <span class="weather-icon" id="weather-icon">🌤️</span>
       <span id="weather-text">--°C</span>
     </div>
-    <div class="burn-badge">
+    <a class="burn-badge" href="/burn.html">
       <span class="burn-fire">🔥</span>
       <span class="burn-text" id="burn-count">-- days</span>
-    </div>
+    </a>
     <div class="refresh-badge">
       <div class="pulse-dot"></div>
       <span id="countdown">60s</span>
@@ -287,8 +306,8 @@ const REFRESH_MS = 60000;
 const AFRICA_BURN = new Date('2026-04-27T00:00:00+02:00');
 
 
-// ── Theme ──────────────────────────────────────────────────────────────────
-let theme = localStorage.getItem('theme') || 'dark';
+// ── Theme (respects system preference on first load) ───────────────────────
+let theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
 document.documentElement.setAttribute('data-theme', theme);
 document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
 document.getElementById('theme-btn').addEventListener('click', () => {
@@ -433,19 +452,44 @@ const AGENTS = {
     },
     {
       emoji:'💪', name:'Greg', role:'Health & longevity — biometrics, Garmin, blood work',
-      link: '/greg.html',
+      link: '/greg.html', notifId: 'greg',
       cronIds:[], tags:[{l:'Health',c:'idle'},{l:'On demand',c:'idle'},{l:'View snapshot →',c:'accent'}],
       extra: (data) => {
         const g = data?.agents?.greg || {};
         const days = g.daysSinceActive;
         const cls = days === null ? 'idle' : days > 14 ? 'error' : days > 7 ? 'warn' : 'ok';
         const label = days === null ? 'Never used' : days === 0 ? 'Active today' : `Last: ${days}d ago`;
-        return `<div class="agent-status-row"><span class="tag tag-${cls}">${label}</span></div>`;
+        const snap = data?.gregSnap;
+        const updatedLine = snap?.updatedAtLabel ? `<div class="agent-updated">Snapshot: ${snap.updatedAtLabel}</div>` : '';
+        // Mini body comp sparkline
+        const weights = [{l:'May 25',v:78.5},{l:'Nov 25',v:77.1},{l:'Feb 26',v:75.5}];
+        const bfs = [{l:'May 25',v:12.5},{l:'Nov 25',v:11.6},{l:'Feb 26',v:11.4}];
+        const sparkline = (pts, color, min, max) => {
+          const w=80,h=22,pad=2;
+          const xStep=(w-pad*2)/(pts.length-1);
+          const yScale=v=>h-pad-((v-min)/(max-min))*(h-pad*2);
+          let d=pts.map((p,i)=>`${i===0?'M':'L'}${(pad+i*xStep).toFixed(1)},${yScale(p.v).toFixed(1)}`).join(' ');
+          return `<svg width="${w}" height="${h}" style="overflow:visible"><polyline points="${pts.map((p,i)=>`${pad+i*xStep},${yScale(p.v)}`).join(' ')}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>${pts.map((p,i)=>`<circle cx="${pad+i*xStep}" cy="${yScale(p.v)}" r="2" fill="${color}"/>`).join('')}</svg>`;
+        };
+        return `<div class="agent-status-row"><span class="tag tag-${cls}">${label}</span></div>
+          <div style="display:flex;gap:14px;margin-top:7px;align-items:center">
+            <div style="display:flex;flex-direction:column;gap:1px">
+              <div style="font-size:9px;color:var(--text3)">Weight</div>
+              ${sparkline(weights,'#3ddc84',74,80)}
+              <div style="font-size:9px;color:var(--text3)">75.5kg ↓</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:1px">
+              <div style="font-size:9px;color:var(--text3)">Body Fat</div>
+              ${sparkline(bfs,'#7c6af7',10,14)}
+              <div style="font-size:9px;color:var(--text3)">11.4% ↓</div>
+            </div>
+          </div>${updatedLine}`;
       }
     },
     {
       emoji:'🎯', name:'Coach', role:'Founder performance coach — weekly challenges & reviews',
-      cronIds:[], tags:[{l:'Mon/Fri cadence',c:'idle'}],
+      link: '/coach.html', notifId: 'coach',
+      cronIds:[], tags:[{l:'Mon/Fri cadence',c:'idle'},{l:'View snapshot →',c:'accent'}],
       extra: (data) => {
         const c = data?.agents?.coach || {};
         const days = c.daysSinceActive;
@@ -464,8 +508,9 @@ const AGENTS = {
   work: [
     {
       emoji:'🤖', name:'Angus', role:'GritCargo accounts clerk — invoice filing & Sheets',
+      link: '/angus.html', notifId: 'angus',
       cronIds:['Angus — Morning Run','Angus — Afternoon Run'],
-      tags:[{l:'GritCargo',c:'idle'},{l:'2× daily',c:'idle'}]
+      tags:[{l:'GritCargo',c:'idle'},{l:'2× daily',c:'idle'},{l:'View invoices →',c:'accent'}]
     },
   ]
 };
@@ -476,7 +521,9 @@ function buildCard(agent, jobs, extraData) {
   const tagsHtml = agent.tags.map(t => `<span class="tag tag-${t.c}">${t.l}</span>`).join('');
   const extra = agent.extra ? agent.extra(extraData) : '';
   const errHtml = hasError ? `<div class="error-badge">⚠️ ${crons.find(j=>j.state?.consecutiveErrors>0)?.state?.lastError || 'Error'}</div>` : '';
-  return `<div class="agent-card${hasError?' error-card':''}" ${agent.link ? `data-link="${agent.link}"` : ''} onclick="toggleCard(this)">
+  const notif = extraData?.notifications?.[agent.notifId];
+  const dotHtml = notif ? `<div class="notif-dot ${notif.level} show" title="${notif.msg}"></div>` : '';
+  const card = `<div class="agent-card${hasError?' error-card':''}" ${agent.link ? `data-link="${agent.link}"` : ''} onclick="toggleCard(this)">
     <div class="agent-emoji">${agent.emoji}</div>
     <div class="agent-info">
       <div class="agent-name">${agent.name}</div>
@@ -487,6 +534,7 @@ function buildCard(agent, jobs, extraData) {
       ${historyHtml(crons)}
     </div>
   </div>`;
+  return `<div class="agent-card-wrap">${dotHtml}${card}</div>`;
 }
 
 // ── Sidebar ────────────────────────────────────────────────────────────────
@@ -554,8 +602,29 @@ async function fetchAndRender() {
     document.getElementById('mango-status').textContent = data.gatewayReachable ? '● Online' : '● Degraded';
     document.getElementById('mango-status').className = 'tag ' + (data.gatewayReachable ? 'tag-ok' : 'tag-warn');
 
+    // Fetch Greg snapshot for last-updated label
+    let gregSnap = null;
+    try {
+      const gr = await fetch('/api/greg?t=' + Date.now());
+      if (gr.ok) gregSnap = await gr.json();
+    } catch {}
+
+    // Compute notification dots
+    const notifications = {};
+    // Greg: T retest due
+    notifications['greg'] = { level: 'warn', msg: '⚠ Testosterone retest due ~Apr 2026' };
+    // Dory: 10 missing docs
+    notifications['dory'] = { level: 'warn', msg: '⚠ 10 documents missing — tap to view' };
+    // Coach: if Friday review pending
+    if (data.agents?.coach?.weeklyReview === 'pending') {
+      notifications['coach'] = { level: 'warn', msg: '⚠ Friday review pending' };
+    }
+    // Angus: if cron error
+    const angusErr = jobs.find(j => (j.name === 'Angus — Morning Run' || j.name === 'Angus — Afternoon Run') && (j.state?.consecutiveErrors || 0) > 0);
+    if (angusErr) notifications['angus'] = { level: 'error', msg: '✗ Angus run error' };
+
     // Cards
-    const extraData = { dory: DORY_COUNTS, agents: data.agents };
+    const extraData = { dory: DORY_COUNTS, agents: data.agents, notifications, gregSnap };
     document.getElementById('family-agents').innerHTML = AGENTS.family.map(a => buildCard(a, jobs, extraData)).join('');
     document.getElementById('work-agents').innerHTML = AGENTS.work.map(a => buildCard(a, jobs, extraData)).join('');
 

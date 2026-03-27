@@ -52,6 +52,8 @@
     .doc-table td{padding:8px 10px;font-size:12px;border-bottom:1px solid var(--border);vertical-align:middle;}
     .doc-table tr:last-child td{border-bottom:none;}
     .doc-table tr:hover td{background:var(--surface2);}
+    .quick-action { display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:3px 8px;border-radius:6px;background:rgba(124,106,247,0.1);color:var(--accent);border:1px solid rgba(124,106,247,0.2);text-decoration:none;cursor:pointer;white-space:nowrap;}
+    .quick-action:hover{background:rgba(124,106,247,0.2);}
 
     /* Status badges */
     .badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;}
@@ -163,12 +165,12 @@
     <table class="doc-table">
       <thead><tr><th>Family Member</th><th>Document</th><th>Notes</th><th>Status</th></tr></thead>
       <tbody>
-        <tr><td>Craig</td><td>Unabridged Birth Certificate</td><td>RSA</td><td><span class="badge badge-missing">✗ Missing</span></td></tr>
-        <tr><td>Rebecca</td><td>Unabridged Birth Certificate</td><td>RSA (maiden: Smith)</td><td><span class="badge badge-missing">✗ Missing</span></td></tr>
+        <tr><td>Craig</td><td>Unabridged Birth Certificate</td><td>RSA</td><td><span class="badge badge-missing">✗ Missing</span> <a class="quick-action" href="https://wa.me/27835652856?text=Please+file+Craig+Unabridged+Birth+Certificate" target="_blank">📤 Send to Mango</a></td></tr>
+        <tr><td>Rebecca</td><td>Unabridged Birth Certificate</td><td>RSA (maiden: Smith)</td><td><span class="badge badge-missing">✗ Missing</span> <a class="quick-action" href="https://wa.me/27835652856?text=Please+file+Rebecca+Unabridged+Birth+Certificate" target="_blank">📤 Send</a></td></tr>
         <tr><td>Rachel</td><td>Birth Certificate</td><td>RSA</td><td><span class="badge badge-ok">✓ Filed</span></td></tr>
         <tr><td>Lucy</td><td>Birth Certificate</td><td>RSA</td><td><span class="badge badge-ok">✓ Filed</span></td></tr>
         <tr><td>Emma</td><td>Birth Certificate</td><td>RSA</td><td><span class="badge badge-ok">✓ Filed</span></td></tr>
-        <tr><td>Emma</td><td>Birth Cert + Apostille</td><td>For international use</td><td><span class="badge badge-missing">✗ Missing</span></td></tr>
+        <tr><td>Emma</td><td>Birth Cert + Apostille</td><td>For international use</td><td><span class="badge badge-missing">✗ Missing</span> <a class="quick-action" href="https://wa.me/27835652856?text=Please+file+Emma+Birth+Certificate+with+Apostille" target="_blank">📤 Send</a></td></tr>
       </tbody>
     </table>
   </div>

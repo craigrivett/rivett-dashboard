@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🔥 Afrika Burn 2026</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+  <link rel="manifest" href="/manifest.json"/>
+  <style>
+    [data-theme="dark"]{--bg:#080810;--surface:#0f0f1a;--surface2:#14141f;--border:#1e1e30;--border2:#252538;--text:#dcdcf0;--text2:#7878a0;--text3:#4a4a6a;--burn:#ff7043;--burn2:#ffd040;--green:#3ddc84;--amber:#f9a825;}
+    [data-theme="light"]{--bg:#fef9f0;--surface:#fff;--surface2:#fef3e2;--border:#f0e0c8;--border2:#e8d0b0;--text:#2a1a0a;--text2:#806040;--text3:#c0a080;--burn:#ea580c;--burn2:#d97706;--green:#16a34a;--amber:#d97706;}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;min-height:100vh;}
+    header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+    .h-back{text-decoration:none;color:var(--text2);font-size:13px;}
+    .h-back:hover{color:var(--burn);}
+    .theme-btn{background:none;border:1px solid var(--border2);border-radius:8px;color:var(--text2);padding:4px 8px;cursor:pointer;font-size:13px;}
+    .page{max-width:700px;margin:0 auto;padding:32px 20px 48px;text-align:center;}
+
+    /* Countdown hero */
+    .hero{padding:40px 20px;margin-bottom:32px;}
+    .hero-fire{font-size:64px;margin-bottom:16px;animation:flicker 1.5s infinite alternate;}
+    @keyframes flicker{0%{transform:scale(1) rotate(-2deg);filter:brightness(1);}100%{transform:scale(1.05) rotate(2deg);filter:brightness(1.2);}}
+    .hero-title{font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--burn2),var(--burn));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;}
+    .hero-sub{font-size:13px;color:var(--text2);margin-bottom:28px;}
+    .countdown{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
+    .count-unit{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;min-width:80px;}
+    .count-num{font-size:36px;font-weight:800;color:var(--burn);line-height:1;font-variant-numeric:tabular-nums;}
+    .count-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--text2);margin-top:4px;}
+    .date-line{font-size:12px;color:var(--text3);}
+
+    /* Checklist */
+    .section{margin-bottom:28px;text-align:left;}
+    .section-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text2);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+    .check-list{display:flex;flex-direction:column;gap:6px;}
+    .check-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color 0.15s;user-select:none;}
+    .check-item:hover{border-color:var(--border2);}
+    .check-item.done{opacity:0.5;}
+    .check-item.done .check-box{background:var(--green);border-color:var(--green);}
+    .check-item.done .check-box::after{content:'✓';color:#fff;font-size:11px;font-weight:700;}
+    .check-item.done .check-text{text-decoration:line-through;color:var(--text2);}
+    .check-box{width:20px;height:20px;border-radius:5px;border:2px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+    .check-text{font-size:13px;}
+    .check-tag{margin-left:auto;font-size:10px;padding:2px 6px;border-radius:10px;background:rgba(255,112,67,0.1);color:var(--burn);border:1px solid rgba(255,112,67,0.2);white-space:nowrap;}
+    @media(max-width:500px){.count-unit{min-width:64px;padding:12px 14px;}.count-num{font-size:28px;}}
+  </style>
+</head>
+<body>
+<header>
+  <a class="h-back" href="/">← Back</a>
+  <div style="font-size:14px;font-weight:700">🔥 Afrika Burn 2026</div>
+  <button class="theme-btn" id="theme-btn">☀️</button>
+</header>
+<div class="page">
+
+  <div class="hero">
+    <div class="hero-fire">🔥</div>
+    <div class="hero-title">Afrika Burn 2026</div>
+    <div class="hero-sub">Tankwa Karoo · 27 Apr – 4 May 2026</div>
+    <div class="countdown">
+      <div class="count-unit"><div class="count-num" id="cd-days">--</div><div class="count-label">Days</div></div>
+      <div class="count-unit"><div class="count-num" id="cd-hours">--</div><div class="count-label">Hours</div></div>
+      <div class="count-unit"><div class="count-num" id="cd-mins">--</div><div class="count-label">Minutes</div></div>
+      <div class="count-unit"><div class="count-num" id="cd-secs">--</div><div class="count-label">Seconds</div></div>
+    </div>
+    <div class="date-line">Monday 27 April 2026 · Tankwa Karoo, Northern Cape</div>
+  </div>
+
+  <!-- Checklist -->
+  <div class="section">
+    <div class="section-title"><span>🎒</span> Packing Checklist</div>
+    <div class="check-list" id="checklist"></div>
+    <div style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center">Tap items to check them off · Progress saves on this device</div>
+  </div>
+
+</div>
+<script>
+const BURN_DATE = new Date('2026-04-27T08:00:00+02:00');
+
+function updateCountdown() {
+  const diff = BURN_DATE - Date.now();
+  if (diff <= 0) { document.querySelector('.countdown').innerHTML = '<div style="font-size:24px;color:var(--burn);font-weight:800">🎉 IT\'S BURN TIME!</div>'; return; }
+  const s = Math.floor(diff / 1000);
+  document.getElementById('cd-days').textContent = String(Math.floor(s / 86400)).padStart(2,'0');
+  document.getElementById('cd-hours').textContent = String(Math.floor((s % 86400) / 3600)).padStart(2,'0');
+  document.getElementById('cd-mins').textContent = String(Math.floor((s % 3600) / 60)).padStart(2,'0');
+  document.getElementById('cd-secs').textContent = String(s % 60).padStart(2,'0');
+}
+setInterval(updateCountdown, 1000); updateCountdown();
+
+// Theme
+let theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+document.documentElement.setAttribute('data-theme', theme);
+document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+document.getElementById('theme-btn').addEventListener('click', () => {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('theme', theme);
+});
+
+// Checklist
+const ITEMS = [
+  {text:'Tickets / wristbands',tag:'Essential'},
+  {text:'Water — minimum 3L/day per person',tag:'Essential'},
+  {text:'Tent + groundsheet + mallet',tag:'Camp'},
+  {text:'Sleeping bag (gets cold at night)',tag:'Camp'},
+  {text:'Shade structure / gazebo',tag:'Camp'},
+  {text:'Camp chairs + table',tag:'Camp'},
+  {text:'Dust goggles',tag:'Essential'},
+  {text:'Dust mask / N95 respirators',tag:'Essential'},
+  {text:'Headlamp + spare batteries',tag:'Essential'},
+  {text:'Power bank (large)',tag:'Essential'},
+  {text:'Leave No Trace bags',tag:'Essential'},
+  {text:'Costume/s',tag:'Fun'},
+  {text:'Warm layers (fleece/down)',tag:'Clothes'},
+  {text:'Sunscreen SPF50+',tag:'Health'},
+  {text:'First aid kit',tag:'Health'},
+  {text:'Earplugs',tag:'Sleep'},
+  {text:'Cash (limited card facilities)',tag:'Money'},
+  {text:'Medications + prescriptions',tag:'Health'},
+  {text:'Bike + lights + lock',tag:'Transport'},
+  {text:'Snacks + camp food',tag:'Food'},
+  {text:'Cooler box + ice',tag:'Food'},
+  {text:'Reusable cup (no single-use)',tag:'LNT'},
+  {text:'Wet wipes + hand sanitiser',tag:'Hygiene'},
+  {text:'Sunglasses',tag:'Clothes'},
+  {text:'Portable charger for phone',tag:'Essential'},
+];
+
+const saved = JSON.parse(localStorage.getItem('burn-checklist') || '{}');
+const list = document.getElementById('checklist');
+ITEMS.forEach((item, i) => {
+  const done = saved[i] || false;
+  const div = document.createElement('div');
+  div.className = 'check-item' + (done ? ' done' : '');
+  div.innerHTML = `<div class="check-box"></div><div class="check-text">${item.text}</div><div class="check-tag">${item.tag}</div>`;
+  div.addEventListener('click', () => {
+    div.classList.toggle('done');
+    saved[i] = div.classList.contains('done');
+    localStorage.setItem('burn-checklist', JSON.stringify(saved));
+  });
+  list.appendChild(div);
+});
+</script>
+</body>
+</html>

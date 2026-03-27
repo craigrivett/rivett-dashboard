@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Angus — Accounts</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+  <link rel="manifest" href="/manifest.json"/>
+  <style>
+    [data-theme="dark"]{--bg:#080810;--surface:#0f0f1a;--surface2:#14141f;--surface3:#1a1a28;--border:#1e1e30;--border2:#252538;--accent:#60a5fa;--green:#3ddc84;--amber:#f9a825;--red:#ff5252;--muted:#3a3a55;--text:#dcdcf0;--text2:#7878a0;--text3:#4a4a6a;}
+    [data-theme="light"]{--bg:#f4f4f8;--surface:#fff;--surface2:#f0f0f5;--surface3:#e8e8f0;--border:#dcdce8;--border2:#c8c8d8;--accent:#2563eb;--green:#16a34a;--amber:#d97706;--red:#dc2626;--muted:#9090b0;--text:#1a1a2e;--text2:#606080;--text3:#a0a0b8;}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;min-height:100vh;}
+    header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+    .h-back{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text2);font-size:13px;}
+    .h-back:hover{color:var(--accent);}
+    .h-title{font-size:15px;font-weight:700;}
+    .theme-btn{background:none;border:1px solid var(--border2);border-radius:8px;color:var(--text2);padding:4px 8px;cursor:pointer;font-size:13px;}
+    .page{max-width:860px;margin:0 auto;padding:24px 20px 48px;}
+    .section{margin-bottom:28px;}
+    .section-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+    .badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+    .badge-ok{background:rgba(61,220,132,0.1);color:var(--green);border:1px solid rgba(61,220,132,0.2);}
+    .badge-warn{background:rgba(249,168,37,0.1);color:var(--amber);border:1px solid rgba(249,168,37,0.2);}
+    .badge-idle{background:rgba(58,58,85,0.3);color:var(--text2);border:1px solid var(--border);}
+    /* Stats */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:24px;}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+    .stat-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text2);margin-bottom:6px;}
+    .stat-value{font-size:26px;font-weight:700;color:var(--text);line-height:1;}
+    .stat-sub{font-size:10px;color:var(--text3);margin-top:4px;}
+    /* Run log */
+    .run-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:8px;}
+    .run-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+    .run-time{font-size:11px;font-weight:600;color:var(--text);}
+    .run-body{font-size:11px;color:var(--text2);line-height:1.5;}
+    .run-stats{display:flex;gap:10px;margin-top:6px;}
+    .run-stat{font-size:10px;color:var(--text3);}
+    .run-stat strong{color:var(--accent);}
+    /* Invoice list */
+    .invoice-table{width:100%;border-collapse:collapse;}
+    .invoice-table th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);padding:6px 10px;border-bottom:1px solid var(--border);text-align:left;}
+    .invoice-table td{padding:8px 10px;font-size:12px;border-bottom:1px solid var(--border);}
+    .invoice-table tr:last-child td{border-bottom:none;}
+    .invoice-table tr:hover td{background:var(--surface2);}
+    .flag{color:var(--amber);}
+    @media(max-width:600px){header{padding:0 14px;}.page{padding:16px 12px 32px;}.invoice-table th:nth-child(3),.invoice-table td:nth-child(3){display:none;}}
+  </style>
+</head>
+<body>
+<header>
+  <a class="h-back" href="/">← Back</a>
+  <div class="h-title">🤖 Angus — GritCargo Accounts</div>
+  <button class="theme-btn" id="theme-btn">☀️</button>
+</header>
+<div class="page">
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total Filed</div><div class="stat-value">14</div><div class="stat-sub">All time</div></div>
+    <div class="stat-card"><div class="stat-label">This Week</div><div class="stat-value">4</div><div class="stat-sub">Mar 23–27</div></div>
+    <div class="stat-card"><div class="stat-label">Flagged</div><div class="stat-value" style="color:var(--amber)">3</div><div class="stat-sub">Need attention</div></div>
+    <div class="stat-card"><div class="stat-label">Last Run</div><div class="stat-value" style="font-size:18px">12:01</div><div class="stat-sub">Today SAST</div></div>
+  </div>
+
+  <!-- Recent runs -->
+  <div class="section">
+    <div class="section-title"><span>🕐</span> Recent Runs</div>
+    <div class="run-card">
+      <div class="run-header">
+        <div class="run-time">27 Mar 2026 · 14:01 SAST (Afternoon)</div>
+        <span class="badge badge-idle">0 filed</span>
+      </div>
+      <div class="run-body">No new invoices. Incoming statement confirms R83,375 applied to Dommisse Attorneys invoice 10233 — R46,000 still outstanding.</div>
+      <div class="run-stats"><span class="run-stat">Emails checked: <strong>1</strong></span></div>
+    </div>
+    <div class="run-card">
+      <div class="run-header">
+        <div class="run-time">27 Mar 2026 · 08:05 SAST (Morning)</div>
+        <span class="badge badge-ok">3 filed</span>
+      </div>
+      <div class="run-body">Filed Sanlam Trustees, Luc Garrioch, and Dommisse Attorneys invoices for March 2026. <span class="flag">⚠ Luc entry flagged for missing due date. Dommisse invoice partially paid — VAT refund pending.</span></div>
+      <div class="run-stats"><span class="run-stat">Emails: <strong>3</strong></span><span class="run-stat">Invoices: <strong>3</strong></span></div>
+    </div>
+    <div class="run-card">
+      <div class="run-header">
+        <div class="run-time">26 Mar 2026 · 16:10 SAST (Afternoon)</div>
+        <span class="badge badge-idle">0 filed</span>
+      </div>
+      <div class="run-body">No new invoices or emails to/from accounts@gritcargo.com in past 24h.</div>
+      <div class="run-stats"><span class="run-stat">Emails: <strong>0</strong></span></div>
+    </div>
+    <div class="run-card">
+      <div class="run-header">
+        <div class="run-time">26 Mar 2026 · 15:33 SAST (Morning)</div>
+        <span class="badge badge-ok">14 filed</span>
+      </div>
+      <div class="run-body">Filed invoices from Canva, Framer, Anthropic ×2, Hazmat, LPH ×2, Hetzner, Google Workspace, AWS SA, Chas Everitt, and 3 Yoco payments into Angus Accounts / March 2026. <span class="flag">⚠ Canva and Plato Val de Vie flagged for missing VAT detail.</span></div>
+      <div class="run-stats"><span class="run-stat">Emails: <strong>13</strong></span><span class="run-stat">Invoices: <strong>14</strong></span></div>
+    </div>
+  </div>
+
+  <!-- Invoices filed -->
+  <div class="section">
+    <div class="section-title"><span>📋</span> Filed Invoices (March 2026)</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <table class="invoice-table">
+        <thead><tr><th>Supplier</th><th>Reference</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Sanlam Trustees</td><td>Mar 2026</td><td>—</td><td><span class="badge badge-ok">Filed</span></td></tr>
+          <tr><td>Luc Garrioch</td><td>Mar 2026</td><td>—</td><td><span class="badge badge-warn">⚠ Missing due date</span></td></tr>
+          <tr><td>Dommisse Attorneys</td><td>INV-10233</td><td>R129,375</td><td><span class="badge badge-warn">⚠ Partial · VAT refund pending</span></td></tr>
+          <tr><td>LPH Tax</td><td>SRI0005420</td><td>—</td><td><span class="badge badge-ok">Filed</span></td></tr>
+          <tr><td>LPH Tax</td><td>SRF0009316</td><td>—</td><td><span class="badge badge-ok">Filed</span></td></tr>
+          <tr><td>Hetzner</td><td>085000822113</td><td>—</td><td><span class="badge badge-ok">Filed</span></td></tr>
+          <tr><td>Hazmat</td><td>INV-43553</td><td>—</td><td><span class="badge badge-ok">Filed</span></td></tr>
+          <tr><td>Google Workspace</td><td>5502889750</td><td>—</td><td><span class="badge badge-ok">Filed</span></td></tr>
+          <tr><td>AWS South Africa</td><td>ZINZA26-50361</td><td>—</td><td><span class="badge badge-ok">Filed</span></td></tr>
+          <tr><td>Anthropic</td><td>CHWSXX2G-0002</td><td>—</td><td><span class="badge badge-ok">Filed</span></td></tr>
+          <tr><td>Anthropic</td><td>CHWSXX2G-0003</td><td>—</td><td><span class="badge badge-ok">Filed</span></td></tr>
+          <tr><td>Chas Everitt</td><td>PP4293</td><td>—</td><td><span class="badge badge-ok">Filed</span></td></tr>
+          <tr><td>Framer</td><td>97A706DA-2221095</td><td>—</td><td><span class="badge badge-ok">Filed</span></td></tr>
+          <tr><td>Canva</td><td>04830-36919415</td><td>—</td><td><span class="badge badge-warn">⚠ Missing VAT</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+<script>
+let theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+document.documentElement.setAttribute('data-theme', theme);
+document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+document.getElementById('theme-btn').addEventListener('click', () => {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('theme', theme);
+});
+</script>
+</body>
+</html>
