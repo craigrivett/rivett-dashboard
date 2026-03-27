@@ -124,8 +124,8 @@
 
 <div class="page">
 
-  <div class="data-as-of">
-    📅 Data as of <strong>26 Feb 2026</strong> (last InBody scan) · RHR updated Mar 2026 · Next T retest due ~Apr 2026
+  <div class="data-as-of" id="data-as-of">
+    📅 Loading…
   </div>
 
   <!-- Key metrics -->
@@ -345,6 +345,68 @@
 </div>
 
 <script>
+// ── Live data fetch ────────────────────────────────────────────────────────
+async function loadLiveData() {
+  try {
+    const res = await fetch('/api/greg?t=' + Date.now());
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.stale || data.error) return;
+
+    // Update data-as-of
+    if (data.dataAsOf || data.updatedAtLabel) {
+      document.getElementById('data-as-of').innerHTML =
+        `📅 ${data.dataAsOf || ''} · Updated: <strong>${data.updatedAtLabel || data.updatedAt || '—'}</strong>`;
+    }
+
+    // Update metrics
+    if (data.metrics) {
+      const M = data.metrics;
+      const cards = document.querySelectorAll('.metric-card');
+      const metricMap = {
+        'Weight':       M.weight,
+        'Body Fat':     M.bodyFat,
+        'Muscle Mass':  M.muscleMass,
+        'InBody Score': M.inbody,
+        'Resting HR':   M.rhr,
+        'Visceral Fat': M.visceralFat,
+        'BMR':          M.bmr,
+        'Testosterone': M.testosterone,
+      };
+      cards.forEach(card => {
+        const label = card.querySelector('.metric-label')?.textContent?.trim();
+        const m = metricMap[label];
+        if (!m) return;
+        const valEl = card.querySelector('.metric-value');
+        const trendEl = card.querySelector('.metric-trend');
+        if (valEl) {
+          const unit = valEl.querySelector('.metric-unit');
+          valEl.childNodes[0].textContent = m.value;
+          if (unit) unit.textContent = m.unit;
+        }
+        if (trendEl) trendEl.textContent = m.trendLabel || '';
+        card.className = 'metric-card ' + (m.status === 'good' ? 'good' : m.status === 'warn' || m.status === 'bad' ? 'warn' : '');
+      });
+    }
+
+    // Update RHR chart with live data
+    if (data.rhr && data.rhr.length > 0) {
+      RHR_DATA.splice(0, RHR_DATA.length, ...data.rhr);
+      drawRHR();
+    }
+
+    // Alerts banner
+    if (data.alerts && data.alerts.length > 0) {
+      const banner = document.createElement('div');
+      banner.style.cssText = 'background:rgba(255,82,82,0.1);border:1px solid rgba(255,82,82,0.3);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--red)';
+      banner.innerHTML = data.alerts.map(a => `⚠️ ${a.message}`).join('<br>');
+      document.querySelector('.page').prepend(banner);
+    }
+  } catch(e) {
+    console.log('Live data unavailable, using static snapshot');
+  }
+}
+
 // ── Theme ──────────────────────────────────────────────────────────────────
 let theme = localStorage.getItem('theme') || 'dark';
 document.documentElement.setAttribute('data-theme', theme);
@@ -462,6 +524,7 @@ function drawRHR() {
 
 window.addEventListener('resize', drawRHR);
 drawRHR();
+loadLiveData();
 
 // ── Activity table ─────────────────────────────────────────────────────────
 const ACTIVITY = [
