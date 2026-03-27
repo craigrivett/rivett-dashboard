@@ -55,15 +55,51 @@
 
   <div class="hero">
     <div class="hero-fire">🔥</div>
-    <div class="hero-title">Afrika Burn 2026</div>
-    <div class="hero-sub">Tankwa Karoo · 27 Apr – 4 May 2026</div>
+    <div class="hero-title">Through The Prism</div>
+    <div class="hero-sub">AfrikaBurn 2026 · Tankwa Karoo · 27 Apr – 3 May</div>
     <div class="countdown">
       <div class="count-unit"><div class="count-num" id="cd-days">--</div><div class="count-label">Days</div></div>
       <div class="count-unit"><div class="count-num" id="cd-hours">--</div><div class="count-label">Hours</div></div>
       <div class="count-unit"><div class="count-num" id="cd-mins">--</div><div class="count-label">Minutes</div></div>
       <div class="count-unit"><div class="count-num" id="cd-secs">--</div><div class="count-label">Seconds</div></div>
     </div>
-    <div class="date-line">Monday 27 April 2026 · Tankwa Karoo, Northern Cape</div>
+    <div class="date-line">Monday 27 April – Sunday 3 May 2026 · Tankwa Karoo, between Northern Cape &amp; Western Cape</div>
+  </div>
+
+  <!-- Theme -->
+  <div class="section" style="text-align:left">
+    <div class="section-title"><span>🌈</span> 2026 Theme: Through The Prism</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;font-size:13px;color:var(--text2);line-height:1.7;font-style:italic">
+      "We've transpired through the mysteries of S P A C E and CREATION, and now, as we splash Out Of The Blue, we invite you to step into being, <strong style="color:var(--burn);font-style:normal">Through The Prism</strong>. This is where we begin: not with certainty, but with becoming, with something just on the edge of comprehension, a sound mistaken for song, a moment mistaken for meaning."
+      <div style="margin-top:10px;font-style:normal;font-size:11px;color:var(--text3)">— AfrikaBurn 2026 · <a href="https://tickets.afrikaburn.org/afrikaburn-2026-theme/" target="_blank" style="color:var(--burn);text-decoration:none">Read full theme</a></div>
+    </div>
+  </div>
+
+  <!-- Key info -->
+  <div class="section" style="text-align:left">
+    <div class="section-title"><span>📍</span> Key Info</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:4px">Dates</div>
+        <div style="font-size:13px;font-weight:600">27 Apr – 3 May</div>
+        <div style="font-size:11px;color:var(--text2)">7 nights</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:4px">Location</div>
+        <div style="font-size:13px;font-weight:600">Tankwa Karoo</div>
+        <div style="font-size:11px;color:var(--text2)">Northern/Western Cape border</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:4px">Leave No Trace</div>
+        <div style="font-size:13px;font-weight:600">MOOP aware</div>
+        <div style="font-size:11px;color:var(--text2)">Pack it in, pack it out</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:4px">Tickets</div>
+        <div style="font-size:13px;font-weight:600"><a href="https://tickets.afrikaburn.org" target="_blank" style="color:var(--burn);text-decoration:none">tickets.afrikaburn.org</a></div>
+        <div style="font-size:11px;color:var(--text2)">Check for availability</div>
+      </div>
+    </div>
   </div>
 
   <!-- Checklist -->
@@ -75,7 +111,7 @@
 
 </div>
 <script>
-const BURN_DATE = new Date('2026-04-27T08:00:00+02:00');
+const BURN_DATE = new Date('2026-04-27T10:00:00+02:00'); // Gates open ~10am SAST
 
 function updateCountdown() {
   const diff = BURN_DATE - Date.now();
@@ -126,6 +162,12 @@ const ITEMS = [
   {text:'Wet wipes + hand sanitiser',tag:'Hygiene'},
   {text:'Sunglasses',tag:'Clothes'},
   {text:'Portable charger for phone',tag:'Essential'},
+  // LNT
+  {text:'Designated trash bags (sorted — recyclable & general)',tag:'LNT'},
+  {text:'Camp MOOP rep nominated',tag:'LNT'},
+  {text:'No glitter, feather boas, bindis, sequins',tag:'LNT'},
+  {text:'Cigarette butt container (if you smoke)',tag:'LNT'},
+  {text:'Greywater collection plan for camp',tag:'LNT'},
 ];
 
 const saved = JSON.parse(localStorage.getItem('burn-checklist') || '{}');
