@@ -39,46 +39,85 @@
 
     /* ── MOBILE ── */
     @media (max-width: 768px) {
-      html, body { height: auto; overflow: auto; }
+      html, body { height: auto !important; overflow: auto !important; }
+
       body {
-        grid-template-rows: auto auto auto auto;
-        grid-template-columns: 1fr;
-        height: auto;
+        display: flex !important;
+        flex-direction: column !important;
+        height: auto !important;
         min-height: 100vh;
       }
-      header { grid-column: 1; padding: 10px 16px; flex-wrap: wrap; gap: 8px; height: auto; }
-      .h-right { gap: 10px; flex-wrap: wrap; }
-      .clock { font-size: 15px; }
+
+      /* Header: single row, compact */
+      header {
+        flex-shrink: 0;
+        padding: 10px 14px;
+        height: auto;
+        flex-wrap: nowrap;
+        gap: 8px;
+      }
+      .h-sub { display: none; }
+      .h-title { font-size: 14px; }
+      .h-right { gap: 8px; flex-wrap: nowrap; align-items: center; }
+      .burn-badge { padding: 3px 8px; gap: 5px; }
+      .burn-fire { font-size: 13px; }
       .burn-text { font-size: 11px; }
-      .burn-badge { padding: 3px 9px; }
+      .refresh-badge { display: none; }
+      .clock { font-size: 13px; }
+
+      /* Main: flex column, scrollable */
       main {
-        grid-column: 1;
-        padding: 14px 12px;
+        flex: none;
+        padding: 12px;
+        overflow: visible;
+        height: auto;
+        gap: 12px;
+      }
+
+      /* CEO card full width */
+      .ceo-row { width: 100%; }
+      .agent-card.ceo { min-width: 0; width: 100%; padding: 12px 14px; }
+      .agent-card.ceo .agent-emoji { font-size: 28px; }
+      .agent-card.ceo .agent-name { font-size: 16px; }
+      .connector { display: none; }
+
+      /* Divisions: single column */
+      .divisions {
+        display: flex !important;
+        flex-direction: column;
+        gap: 12px;
         overflow: visible;
         height: auto;
       }
-      .divisions { grid-template-columns: 1fr; gap: 12px; overflow: visible; }
-      .division { overflow: visible; }
-      .div-agents { overflow: visible; }
-      .agent-card.ceo { min-width: 0; width: 100%; }
+      .division { overflow: visible; height: auto; }
+      .div-agents { overflow: visible; height: auto; padding: 10px; gap: 8px; }
+
+      /* Agent cards */
+      .agent-card { padding: 10px 12px; }
+      .agent-emoji { font-size: 22px; }
+      .agent-name { font-size: 13px; }
+      .dory-stats { flex-wrap: wrap; }
+
+      /* Sidebar: full width below main */
       aside {
-        grid-column: 1;
+        flex: none;
         border-left: none;
         border-top: 1px solid var(--border);
-        max-height: none;
         overflow: visible;
-      }
-      .cron-list { overflow: visible; }
-      footer {
-        grid-column: 1;
-        flex-wrap: wrap;
-        gap: 6px;
-        padding: 10px 16px;
         height: auto;
       }
-      .sys-items { flex-wrap: wrap; gap: 10px; }
-      .connector { display: none; }
-      .dory-stats { flex-wrap: wrap; }
+      .cron-list { overflow: visible; height: auto; }
+
+      /* Footer */
+      footer {
+        flex-shrink: 0;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 10px 14px;
+        height: auto;
+      }
+      .sys-items { flex-wrap: wrap; gap: 8px; }
+      .footer-right { width: 100%; margin-top: 2px; }
     }
 
     /* ── HEADER ── */
