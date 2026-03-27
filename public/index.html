@@ -432,7 +432,8 @@ const AGENTS = {
     },
     {
       emoji:'💪', name:'Greg', role:'Health & longevity — biometrics, Garmin, blood work',
-      cronIds:[], tags:[{l:'Health',c:'idle'},{l:'On demand',c:'idle'}],
+      link: '/greg.html',
+      cronIds:[], tags:[{l:'Health',c:'idle'},{l:'On demand',c:'idle'},{l:'View snapshot →',c:'accent'}],
       extra: (data) => {
         const g = data?.agents?.greg || {};
         const days = g.daysSinceActive;
