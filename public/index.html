@@ -1,182 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rivett Command Centre</title>
   <style>
-    :root {
-      --bg: #080810;
-      --surface: #0f0f1a;
-      --surface2: #14141f;
-      --surface3: #1a1a28;
-      --border: #1e1e30;
-      --border2: #252538;
-      --accent: #7c6af7;
-      --accent2: #4fc3f7;
-      --green: #3ddc84;
-      --amber: #f9a825;
-      --red: #ff5252;
-      --muted: #3a3a55;
-      --text: #dcdcf0;
-      --text2: #7878a0;
-      --text3: #4a4a6a;
-      --family: #f472b6;
-      --work: #60a5fa;
-      --burn: #ff7043;
+    /* ── THEMES ── */
+    [data-theme="dark"] {
+      --bg: #080810; --surface: #0f0f1a; --surface2: #14141f; --surface3: #1a1a28;
+      --border: #1e1e30; --border2: #252538; --accent: #7c6af7;
+      --green: #3ddc84; --amber: #f9a825; --red: #ff5252; --muted: #3a3a55;
+      --text: #dcdcf0; --text2: #7878a0; --text3: #4a4a6a;
+      --family: #f472b6; --work: #60a5fa; --burn: #ff7043;
+      --card-hover: #1a1a28;
     }
+    [data-theme="light"] {
+      --bg: #f4f4f8; --surface: #ffffff; --surface2: #f0f0f5; --surface3: #e8e8f0;
+      --border: #dcdce8; --border2: #c8c8d8; --accent: #6654e8;
+      --green: #16a34a; --amber: #d97706; --red: #dc2626; --muted: #9090b0;
+      --text: #1a1a2e; --text2: #5050708; --text3: #a0a0b8;
+      --family: #db2777; --work: #2563eb; --burn: #ea580c;
+      --card-hover: #eaeaf2;
+      --text2: #606080;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; }
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       font-family: 'SF Pro Display', 'Inter', 'Segoe UI', system-ui, sans-serif;
       display: grid;
       grid-template-rows: 60px 1fr 44px;
       grid-template-columns: 1fr 300px;
       height: 100vh;
-    }
-
-    /* ── MOBILE ── */
-    @media (max-width: 768px) {
-      html, body { height: auto !important; overflow: auto !important; }
-
-      body {
-        display: flex !important;
-        flex-direction: column !important;
-        height: auto !important;
-        min-height: 100vh;
-      }
-
-      /* Header: single row, compact */
-      header {
-        flex-shrink: 0;
-        padding: 10px 14px;
-        height: auto;
-        flex-wrap: nowrap;
-        gap: 8px;
-      }
-      .h-sub { display: none; }
-      .h-title { font-size: 14px; }
-      .h-right { gap: 8px; flex-wrap: nowrap; align-items: center; }
-      .burn-badge { padding: 3px 8px; gap: 5px; }
-      .burn-fire { font-size: 13px; }
-      .burn-text { font-size: 11px; }
-      .refresh-badge { display: none; }
-      .clock { font-size: 13px; }
-
-      /* Main: flex column, scrollable */
-      main {
-        flex: none;
-        padding: 12px;
-        overflow: visible;
-        height: auto;
-        gap: 12px;
-      }
-
-      /* CEO card full width */
-      .ceo-row { width: 100%; }
-      .agent-card.ceo { min-width: 0; width: 100%; padding: 12px 14px; }
-      .agent-card.ceo .agent-emoji { font-size: 28px; }
-      .agent-card.ceo .agent-name { font-size: 16px; }
-      .connector { display: none; }
-
-      /* Divisions: single column */
-      .divisions {
-        display: flex !important;
-        flex-direction: column;
-        gap: 12px;
-        overflow: visible;
-        height: auto;
-      }
-      .division { overflow: visible; height: auto; }
-      .div-agents { overflow: visible; height: auto; padding: 10px; gap: 8px; }
-
-      /* Agent cards */
-      .agent-card { padding: 10px 12px; }
-      .agent-emoji { font-size: 22px; }
-      .agent-name { font-size: 13px; }
-      .dory-stats { flex-wrap: wrap; }
-
-      /* Sidebar: full width below main */
-      aside {
-        flex: none;
-        border-left: none;
-        border-top: 1px solid var(--border);
-        overflow: visible;
-        height: auto;
-      }
-      .cron-list { overflow: visible; height: auto; }
-
-      /* Footer */
-      footer {
-        flex-shrink: 0;
-        flex-wrap: wrap;
-        gap: 6px;
-        padding: 10px 14px;
-        height: auto;
-      }
-      .sys-items { flex-wrap: wrap; gap: 8px; }
-      .footer-right { width: 100%; margin-top: 2px; }
+      transition: background 0.3s, color 0.3s;
     }
 
     /* ── HEADER ── */
     header {
       grid-column: 1 / -1;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 24px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
+      padding: 0 24px; background: var(--surface); border-bottom: 1px solid var(--border);
     }
     .h-left { display: flex; align-items: center; gap: 14px; }
-    .h-title { font-size: 16px; font-weight: 700; letter-spacing: 0.04em; color: var(--text); }
+    .h-title { font-size: 16px; font-weight: 700; letter-spacing: 0.04em; }
     .h-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
-    .h-right { display: flex; align-items: center; gap: 20px; }
+    .h-right { display: flex; align-items: center; gap: 14px; }
     .burn-badge {
-      display: flex; align-items: center; gap: 8px;
+      display: flex; align-items: center; gap: 6px;
       background: rgba(255,112,67,0.1); border: 1px solid rgba(255,112,67,0.25);
-      border-radius: 20px; padding: 4px 12px;
+      border-radius: 20px; padding: 4px 12px; cursor: default;
     }
-    .burn-fire { font-size: 16px; animation: flicker 2s infinite alternate; }
-    @keyframes flicker { 0% { opacity: 1; } 100% { opacity: 0.7; transform: scale(0.95); } }
+    .burn-fire { font-size: 15px; animation: flicker 2s infinite alternate; }
+    @keyframes flicker { 0%{opacity:1} 100%{opacity:0.65;transform:scale(0.95)} }
     .burn-text { font-size: 12px; font-weight: 600; color: var(--burn); }
-    .clock { font-size: 20px; font-weight: 300; font-variant-numeric: tabular-nums; color: var(--text); }
-    .refresh-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text2); }
+    .weather-widget { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text2); }
+    .weather-icon { font-size: 16px; }
+    .clock { font-size: 18px; font-weight: 300; font-variant-numeric: tabular-nums; }
+    .refresh-badge { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
     .pulse-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .theme-btn {
+      background: none; border: 1px solid var(--border2); border-radius: 8px;
+      color: var(--text2); padding: 4px 8px; cursor: pointer; font-size: 14px;
+      transition: border-color 0.2s; line-height: 1;
+    }
+    .theme-btn:hover { border-color: var(--accent); }
 
     /* ── MAIN ── */
-    main {
-      grid-column: 1; padding: 20px 16px 16px 24px;
-      display: flex; flex-direction: column; gap: 16px; overflow: hidden;
-    }
-
-    /* CEO row */
+    main { grid-column: 1; padding: 18px 16px 14px 24px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
     .ceo-row { display: flex; justify-content: center; }
+
+    /* ── AGENT CARDS ── */
     .agent-card {
       background: var(--surface2); border: 1px solid var(--border);
       border-radius: 10px; padding: 11px 14px;
       display: flex; align-items: flex-start; gap: 11px;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, background 0.2s;
+      cursor: pointer;
     }
-    .agent-card:hover { border-color: var(--border2); }
+    .agent-card:hover { border-color: var(--border2); background: var(--card-hover); }
     .agent-card.ceo {
       background: linear-gradient(135deg, #1a1535 0%, #0f0f1a 100%);
-      border-color: var(--accent); padding: 14px 22px; min-width: 300px;
+      border-color: var(--accent); padding: 14px 22px; min-width: 300px; cursor: default;
     }
-    .agent-emoji { font-size: 26px; line-height: 1; flex-shrink: 0; }
-    .agent-card.ceo .agent-emoji { font-size: 36px; }
+    [data-theme="light"] .agent-card.ceo { background: linear-gradient(135deg, #ede9fe 0%, #ffffff 100%); }
+    .agent-emoji { font-size: 24px; line-height: 1; flex-shrink: 0; }
+    .agent-card.ceo .agent-emoji { font-size: 34px; }
     .agent-info { flex: 1; min-width: 0; }
-    .agent-name { font-size: 14px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .agent-card.ceo .agent-name { font-size: 19px; }
+    .agent-name { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .agent-card.ceo .agent-name { font-size: 18px; }
     .agent-role { font-size: 10px; color: var(--text2); margin-top: 2px; }
-    .agent-meta { margin-top: 7px; display: flex; flex-wrap: wrap; gap: 5px; }
+    .agent-meta { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 5px; }
+
     .tag { font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 500; letter-spacing: 0.02em; white-space: nowrap; }
-    .tag-ok    { background: rgba(61,220,132,0.1); color: var(--green); border: 1px solid rgba(61,220,132,0.2); }
-    .tag-warn  { background: rgba(249,168,37,0.1); color: var(--amber); border: 1px solid rgba(249,168,37,0.2); }
-    .tag-error { background: rgba(255,82,82,0.1);  color: var(--red);   border: 1px solid rgba(255,82,82,0.2); }
-    .tag-idle  { background: rgba(58,58,85,0.4);   color: var(--text2); border: 1px solid var(--border); }
-    .tag-accent{ background: rgba(124,106,247,0.1);color: var(--accent);border: 1px solid rgba(124,106,247,0.2); }
+    .tag-ok    { background: rgba(61,220,132,0.1);  color: var(--green); border: 1px solid rgba(61,220,132,0.2); }
+    .tag-warn  { background: rgba(249,168,37,0.1);  color: var(--amber); border: 1px solid rgba(249,168,37,0.2); }
+    .tag-error { background: rgba(255,82,82,0.1);   color: var(--red);   border: 1px solid rgba(255,82,82,0.2); }
+    .tag-idle  { background: rgba(58,58,85,0.3);    color: var(--text2); border: 1px solid var(--border); }
+    .tag-accent{ background: rgba(124,106,247,0.1); color: var(--accent);border: 1px solid rgba(124,106,247,0.2); }
+    [data-theme="light"] .tag-idle { background: rgba(180,180,210,0.2); }
+
     .agent-crons { margin-top: 7px; display: flex; flex-direction: column; gap: 4px; }
     .cron-item { font-size: 10px; color: var(--text2); display: flex; align-items: center; gap: 6px; }
     .cron-item .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
@@ -184,66 +108,113 @@
     .dot-warn  { background: var(--amber); }
     .dot-error { background: var(--red); }
     .dot-idle  { background: var(--muted); }
+    .cron-dur  { color: var(--text3); font-size: 9px; }
     .cron-next { margin-left: auto; color: var(--text3); font-size: 9px; }
 
-    .connector { display: flex; justify-content: center; color: var(--muted); font-size: 16px; line-height: 0.6; margin: 2px 0; }
+    /* Expand drawer */
+    .agent-drawer { display: none; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
+    .agent-card.expanded .agent-drawer { display: block; }
+    .drawer-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 6px; }
+    .history-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; font-size: 10px; color: var(--text2); }
+    .history-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 
-    /* Divisions */
-    .divisions { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; overflow: hidden; }
+    .connector { display: flex; justify-content: center; color: var(--muted); font-size: 14px; line-height: 0.6; margin: 2px 0; }
+    .divisions { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; overflow: hidden; }
     .division { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
-    .div-header { padding: 12px 16px 8px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .div-header { padding: 10px 14px 8px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
     .div-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
     .div-title.family { color: var(--family); }
     .div-title.work   { color: var(--work); }
-    .div-agents { flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 9px; overflow-y: auto; }
+    .div-agents { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
 
     /* Dory stats */
-    .dory-stats { display: flex; gap: 6px; margin-top: 6px; }
-    .stat-pill { background: var(--surface3); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 10px; color: var(--text2); display: flex; flex-direction: column; align-items: center; min-width: 48px; }
-    .stat-num { font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.1; }
+    .dory-stats { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+    .stat-pill { background: var(--surface3); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 10px; color: var(--text2); display: flex; flex-direction: column; align-items: center; min-width: 44px; }
+    .stat-num { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.1; }
+
+    /* Greg / Coach status */
+    .agent-status-row { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+
+    /* Error flash */
+    .error-card { border-color: var(--red) !important; }
+    .error-badge { background: rgba(255,82,82,0.1); color: var(--red); border: 1px solid rgba(255,82,82,0.2); border-radius: 6px; padding: 4px 8px; font-size: 10px; margin-top: 6px; }
 
     /* ── SIDEBAR ── */
-    aside {
-      grid-column: 2; border-left: 1px solid var(--border); background: var(--surface);
-      display: flex; flex-direction: column; overflow: hidden;
-    }
-    .aside-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text2); }
+    aside { grid-column: 2; border-left: 1px solid var(--border); background: var(--surface); display: flex; flex-direction: column; overflow: hidden; }
+    .aside-header { padding: 12px 14px 8px; border-bottom: 1px solid var(--border); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text2); }
     .cron-list { flex: 1; overflow-y: auto; }
-    .cron-group { padding: 0 14px 4px; }
-    .cron-group-label { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; padding: 8px 0 4px; }
-    .cron-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(30,30,48,0.7); }
+    .cron-group { padding: 0 12px 4px; }
+    .cron-group-label { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; padding: 7px 0 3px; }
+    .cron-row { display: flex; align-items: center; gap: 7px; padding: 5px 0; border-bottom: 1px solid rgba(30,30,48,0.5); }
+    [data-theme="light"] .cron-row { border-bottom-color: rgba(200,200,220,0.5); }
     .cron-row:last-child { border-bottom: none; }
+    .cron-row.error-row { background: rgba(255,82,82,0.05); border-radius: 4px; padding: 5px 4px; }
     .cron-status { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .cron-details { flex: 1; min-width: 0; }
-    .cron-name { font-size: 10px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cron-name { font-size: 10px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .cron-sched { font-size: 9px; color: var(--text2); margin-top: 1px; }
-    .cron-last { font-size: 9px; color: var(--text2); flex-shrink: 0; text-align: right; }
-    .cron-next-time { font-size: 9px; color: var(--text3); text-align: right; margin-top: 1px; }
+    .cron-right { flex-shrink: 0; text-align: right; }
+    .cron-last { font-size: 9px; color: var(--text2); }
+    .cron-next-time { font-size: 9px; color: var(--text3); margin-top: 1px; }
+    .cron-dur-badge { font-size: 9px; color: var(--text3); }
+    .cron-error-msg { font-size: 9px; color: var(--red); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Afrika Burn progress bar */
+    .burn-progress-wrap { padding: 10px 14px 6px; border-bottom: 1px solid var(--border); }
+    .burn-progress-label { font-size: 9px; color: var(--text3); margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .burn-bar-bg { height: 4px; background: var(--border2); border-radius: 2px; overflow: hidden; }
+    .burn-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--burn)); border-radius: 2px; transition: width 1s ease; }
 
     /* ── FOOTER ── */
-    footer {
-      grid-column: 1 / -1; background: var(--surface); border-top: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
-    }
-    .sys-items { display: flex; align-items: center; gap: 20px; }
-    .sys-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text2); }
+    footer { grid-column: 1 / -1; background: var(--surface); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+    .sys-items { display: flex; align-items: center; gap: 18px; }
+    .sys-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--text2); }
     .sys-dot { width: 6px; height: 6px; border-radius: 50%; }
     .sys-dot.ok    { background: var(--green); }
     .sys-dot.warn  { background: var(--amber); }
-    .sys-dot.error { background: var(--red); box-shadow: 0 0 6px var(--red); }
+    .sys-dot.error { background: var(--red); box-shadow: 0 0 5px var(--red); }
     .sys-dot.idle  { background: var(--muted); }
     .footer-right { font-size: 9px; color: var(--text3); }
 
-    /* scrollbar */
     ::-webkit-scrollbar { width: 3px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
     .loading { color: var(--text2); font-size: 11px; padding: 16px; text-align: center; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      html, body { height: auto !important; overflow: auto !important; }
+      body { display: flex !important; flex-direction: column !important; height: auto !important; min-height: 100vh; }
+      header { flex-shrink: 0; padding: 10px 14px; height: auto; flex-wrap: nowrap; gap: 8px; }
+      .h-sub { display: none; }
+      .h-title { font-size: 13px; }
+      .h-right { gap: 8px; }
+      .burn-badge { padding: 3px 8px; gap: 4px; }
+      .burn-fire { font-size: 13px; }
+      .burn-text { font-size: 10px; }
+      .weather-widget { display: none; }
+      .refresh-badge { display: none; }
+      .clock { font-size: 13px; }
+      main { flex: none; padding: 12px; overflow: visible; height: auto; gap: 12px; }
+      .ceo-row { width: 100%; }
+      .agent-card.ceo { min-width: 0; width: 100%; padding: 12px 14px; }
+      .agent-card.ceo .agent-emoji { font-size: 26px; }
+      .agent-card.ceo .agent-name { font-size: 15px; }
+      .connector { display: none; }
+      .divisions { display: flex !important; flex-direction: column; gap: 12px; overflow: visible; height: auto; }
+      .division { overflow: visible; height: auto; }
+      .div-agents { overflow: visible; height: auto; padding: 10px; gap: 8px; }
+      aside { flex: none; border-left: none; border-top: 1px solid var(--border); overflow: visible; height: auto; }
+      .cron-list { overflow: visible; height: auto; }
+      footer { flex-shrink: 0; flex-wrap: wrap; gap: 6px; padding: 10px 14px; height: auto; }
+      .sys-items { flex-wrap: wrap; gap: 8px; }
+      .footer-right { width: 100%; margin-top: 2px; }
+      .burn-progress-wrap { padding: 8px 12px; }
+    }
   </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header>
   <div class="h-left">
     <div>
@@ -252,19 +223,23 @@
     </div>
   </div>
   <div class="h-right">
+    <div class="weather-widget" id="weather-widget" style="display:none">
+      <span class="weather-icon" id="weather-icon">🌤️</span>
+      <span id="weather-text">--°C</span>
+    </div>
     <div class="burn-badge">
       <span class="burn-fire">🔥</span>
-      <span class="burn-text" id="burn-count">-- days to Afrika Burn</span>
+      <span class="burn-text" id="burn-count">-- days</span>
     </div>
     <div class="refresh-badge">
       <div class="pulse-dot"></div>
       <span id="countdown">60s</span>
     </div>
-    <div class="clock" id="clock">--:--:-- SAST</div>
+    <div class="clock" id="clock">--:--:--</div>
+    <button class="theme-btn" id="theme-btn" title="Toggle theme">☀️</button>
   </div>
 </header>
 
-<!-- MAIN -->
 <main>
   <div class="ceo-row">
     <div class="agent-card ceo">
@@ -293,13 +268,18 @@
   </div>
 </main>
 
-<!-- SIDEBAR -->
 <aside>
   <div class="aside-header">Mango's Cron Jobs</div>
+  <div class="burn-progress-wrap" id="burn-progress-wrap" style="display:none">
+    <div class="burn-progress-label">
+      <span>🔥 Afrika Burn countdown</span>
+      <span id="burn-progress-pct">--%</span>
+    </div>
+    <div class="burn-bar-bg"><div class="burn-bar-fill" id="burn-bar" style="width:0%"></div></div>
+  </div>
   <div class="cron-list" id="cron-list"><div class="loading">Loading…</div></div>
 </aside>
 
-<!-- FOOTER -->
 <footer>
   <div class="sys-items" id="sys-items">
     <div class="sys-item"><div class="sys-dot idle"></div><span>Loading…</span></div>
@@ -310,6 +290,18 @@
 <script>
 const REFRESH_MS = 60000;
 const AFRICA_BURN = new Date('2026-04-27T00:00:00+02:00');
+const BURN_START = new Date('2026-01-01T00:00:00+02:00');
+
+// ── Theme ──────────────────────────────────────────────────────────────────
+let theme = localStorage.getItem('theme') || 'dark';
+document.documentElement.setAttribute('data-theme', theme);
+document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+document.getElementById('theme-btn').addEventListener('click', () => {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('theme', theme);
+});
 
 // ── Clock ──────────────────────────────────────────────────────────────────
 function updateClock() {
@@ -324,6 +316,20 @@ setInterval(updateClock, 1000); updateClock();
 let cd = REFRESH_MS / 1000;
 setInterval(() => { cd = Math.max(0, cd - 1); document.getElementById('countdown').textContent = cd + 's'; }, 1000);
 
+// ── Weather ────────────────────────────────────────────────────────────────
+async function fetchWeather() {
+  try {
+    const r = await fetch('https://wttr.in/Paarl,South+Africa?format=%c+%t+%h', { cache: 'no-cache' });
+    const text = (await r.text()).trim();
+    const parts = text.split(' ');
+    document.getElementById('weather-icon').textContent = parts[0] || '🌤️';
+    document.getElementById('weather-text').textContent = (parts[1] || '--') + ' ' + (parts[2] ? parts[2] + 'RH' : '');
+    document.getElementById('weather-widget').style.display = 'flex';
+  } catch {}
+}
+fetchWeather();
+setInterval(fetchWeather, 10 * 60000);
+
 // ── Helpers ────────────────────────────────────────────────────────────────
 function stClass(s) {
   if (!s || s === 'idle' || s === 'never') return 'idle';
@@ -333,21 +339,20 @@ function stClass(s) {
 }
 function rel(ms) {
   if (!ms) return '—';
-  const d = Date.now() - ms;
-  const m = Math.floor(d / 60000), h = Math.floor(m / 60), dy = Math.floor(h / 24);
-  if (dy > 0) return dy + 'd ago';
-  if (h > 0) return h + 'h ago';
-  if (m > 0) return m + 'm ago';
-  return 'just now';
+  const d = Date.now() - ms, m = Math.floor(d/60000), h = Math.floor(m/60), dy = Math.floor(h/24);
+  if (dy > 0) return dy + 'd ago'; if (h > 0) return h + 'h ago'; if (m > 0) return m + 'm ago'; return 'just now';
 }
 function relNext(ms) {
   if (!ms) return '';
   const d = ms - Date.now();
   if (d < 0) return 'overdue';
-  const m = Math.floor(d / 60000), h = Math.floor(m / 60);
-  if (h > 0) return 'in ' + h + 'h ' + (m % 60) + 'm';
-  if (m > 0) return 'in ' + m + 'm';
-  return 'soon';
+  const m = Math.floor(d/60000), h = Math.floor(m/60);
+  if (h > 0) return 'in ' + h + 'h ' + (m%60) + 'm'; if (m > 0) return 'in ' + m + 'm'; return 'soon';
+}
+function dur(ms) {
+  if (!ms || ms < 1000) return '';
+  const s = Math.floor(ms/1000), m = Math.floor(s/60);
+  return m > 0 ? m + 'm' + (s%60) + 's' : s + 's';
 }
 function sched(expr, tz) {
   const map = {
@@ -355,42 +360,63 @@ function sched(expr, tz) {
     '0 7 * * *':'Daily 7am','0 8 * * *':'Daily 8am','0 12 * * *':'Daily 12pm',
     '0 14 * * *':'Daily 2pm','10 */12 * * *':'Every 12h','15 */12 * * *':'Every 12h',
     '0 0 * * 0':'Sun midnight','0 9 * * 1':'Mon 9am','5 9 * * 1':'Mon 9:05am',
-    '0 8 1 * *':'1st 8am','0 10 1 * *':'1st 10am','30 10 1 * *':'1st 10:30am',
-    '0 12 1 * *':'1st 12pm',
+    '0 8 1 * *':'1st 8am','0 10 1 * *':'1st 10am','30 10 1 * *':'1st 10:30am','0 12 1 * *':'1st 12pm',
   };
-  const label = map[expr] || expr;
-  return label + (tz ? ' ' + tz.replace('Africa/','') : '');
+  return (map[expr] || expr) + (tz ? ' ' + tz.replace('Africa/','') : '');
 }
 const NAMES = {
   'daily-brief':'Daily Brief','Daily Mango Improvement Task':'Self-Improvement',
   'daily-5min-performance-prompt':'Performance Prompt','daily-email-cleanup-drafts':'Email Cleanup',
   'daily-memory-template-maker':'Memory Template','daily-memory-gap-report':'Memory Gap Report',
-  'm365-auth-keepalive':'M365 Auth Keepalive','cron-delivery-watchdog':'Delivery Watchdog',
+  'm365-auth-keepalive':'M365 Keepalive','cron-delivery-watchdog':'Delivery Watchdog',
   'healthcheck:auto-update':'Auto-Update','healthcheck:security-audit':'Security Audit',
-  'healthcheck:update-status':'Version Check','dory-monthly-filing':'Dory Monthly Filing',
+  'healthcheck:update-status':'Version Check','dory-monthly-filing':'Dory Monthly',
   'Monthly Investec Statement Processor':'Investec Statements',
   'monthly-bank-statements-pipeline':'Bank Statements',
   'Monthly Agent Security Scan (Snyk Agent Scan)':'Security Scan',
   'Angus — Morning Run':'Angus Morning','Angus — Afternoon Run':'Angus Afternoon',
 };
 
-// ── Agent cron lookup ──────────────────────────────────────────────────────
+// ── Card expand/collapse ───────────────────────────────────────────────────
+function toggleCard(el) {
+  if (el.classList.contains('ceo')) return;
+  el.classList.toggle('expanded');
+}
+
+// ── Cron items inside card ─────────────────────────────────────────────────
 function getCrons(jobs, ids) {
   return ids.map(id => jobs.find(j => j.name === id || j.id === id)).filter(Boolean);
 }
-
 function cronItemsHtml(crons) {
   if (!crons.length) return '';
   return '<div class="agent-crons">' + crons.map(j => {
     const st = j.state?.lastRunStatus || 'idle';
     const cls = stClass(st);
-    const next = relNext(j.state?.nextRunAtMs);
+    const d = dur(j.state?.lastDurationMs);
     return `<div class="cron-item">
       <div class="dot dot-${cls}"></div>
       <span>${sched(j.schedule?.expr, j.schedule?.tz)}</span>
-      <span class="cron-next">${next}</span>
+      ${d ? `<span class="cron-dur">${d}</span>` : ''}
+      <span class="cron-next">${relNext(j.state?.nextRunAtMs)}</span>
     </div>`;
   }).join('') + '</div>';
+}
+function historyHtml(crons) {
+  if (!crons.length) return '';
+  return `<div class="agent-drawer">
+    <div class="drawer-title">Recent runs</div>
+    ${crons.map(j => {
+      const st = j.state?.lastRunStatus || 'idle';
+      const cls = stClass(st);
+      const d = dur(j.state?.lastDurationMs);
+      const err = j.state?.lastError && j.state.lastError !== 'disabled' ? j.state.lastError : '';
+      return `<div class="history-row">
+        <div class="history-dot sys-dot ${cls}"></div>
+        <span>${NAMES[j.name] || j.name}</span>
+        <span style="margin-left:auto;color:var(--text3)">${rel(j.state?.lastRunAtMs)}${d?' · '+d:''}</span>
+      </div>${err ? `<div style="font-size:9px;color:var(--red);padding-left:13px;margin-bottom:2px">${err}</div>` : ''}`;
+    }).join('')}
+  </div>`;
 }
 
 // ── Agent definitions ──────────────────────────────────────────────────────
@@ -401,17 +427,43 @@ const AGENTS = {
       cronIds:['dory-monthly-filing'],
       tags:[{l:'OneDrive',c:'idle'},{l:'Monthly',c:'idle'}],
       extra: (data) => {
-        const docs = data?.dory || {};
+        const d = data?.dory || {};
         return `<div class="dory-stats">
-          <div class="stat-pill"><div class="stat-num">${docs.idPassports||'—'}</div><div>IDs</div></div>
-          <div class="stat-pill"><div class="stat-num">${docs.births||'—'}</div><div>Births</div></div>
-          <div class="stat-pill"><div class="stat-num">${docs.schoolReports||'—'}</div><div>Reports</div></div>
-          <div class="stat-pill"><div class="stat-num">${docs.legal||'—'}</div><div>Legal</div></div>
+          <div class="stat-pill"><div class="stat-num">${d.idPassports||'—'}</div><div>IDs</div></div>
+          <div class="stat-pill"><div class="stat-num">${d.births||'—'}</div><div>Births</div></div>
+          <div class="stat-pill"><div class="stat-num">${d.schoolReports||'—'}</div><div>Reports</div></div>
+          <div class="stat-pill"><div class="stat-num">${d.legal||'—'}</div><div>Legal</div></div>
         </div>`;
       }
     },
-    { emoji:'💪', name:'Greg', role:'Health & longevity — biometrics, Garmin, blood work', cronIds:[], tags:[{l:'Health',c:'idle'},{l:'On demand',c:'idle'}] },
-    { emoji:'🎯', name:'Coach', role:'Founder performance coach — weekly challenges & reviews', cronIds:[], tags:[{l:'Mon/Fri cadence',c:'idle'}] },
+    {
+      emoji:'💪', name:'Greg', role:'Health & longevity — biometrics, Garmin, blood work',
+      cronIds:[], tags:[{l:'Health',c:'idle'},{l:'On demand',c:'idle'}],
+      extra: (data) => {
+        const g = data?.agents?.greg || {};
+        const days = g.daysSinceActive;
+        const cls = days === null ? 'idle' : days > 14 ? 'error' : days > 7 ? 'warn' : 'ok';
+        const label = days === null ? 'Never used' : days === 0 ? 'Active today' : `Last: ${days}d ago`;
+        return `<div class="agent-status-row"><span class="tag tag-${cls}">${label}</span></div>`;
+      }
+    },
+    {
+      emoji:'🎯', name:'Coach', role:'Founder performance coach — weekly challenges & reviews',
+      cronIds:[], tags:[{l:'Mon/Fri cadence',c:'idle'}],
+      extra: (data) => {
+        const c = data?.agents?.coach || {};
+        const days = c.daysSinceActive;
+        const activeCls = days === null ? 'idle' : days > 14 ? 'error' : days > 7 ? 'warn' : 'ok';
+        const activeLabel = days === null ? 'Never used' : days === 0 ? 'Active today' : `Last: ${days}d ago`;
+        const challengeCls = c.weeklyChallenge === 'set' ? 'ok' : c.weeklyChallenge === 'pending' ? 'warn' : 'idle';
+        const reviewCls = c.weeklyReview === 'done' ? 'ok' : c.weeklyReview === 'pending' ? 'warn' : 'idle';
+        return `<div class="agent-status-row">
+          <span class="tag tag-${activeCls}">${activeLabel}</span>
+          <span class="tag tag-${challengeCls}">Mon: ${c.weeklyChallenge || '—'}</span>
+          <span class="tag tag-${reviewCls}">Fri: ${c.weeklyReview || '—'}</span>
+        </div>`;
+      }
+    },
   ],
   work: [
     {
@@ -424,67 +476,68 @@ const AGENTS = {
 
 function buildCard(agent, jobs, extraData) {
   const crons = getCrons(jobs, agent.cronIds);
+  const hasError = crons.some(j => (j.state?.consecutiveErrors || 0) > 0);
   const tagsHtml = agent.tags.map(t => `<span class="tag tag-${t.c}">${t.l}</span>`).join('');
   const extra = agent.extra ? agent.extra(extraData) : '';
-  return `<div class="agent-card">
+  const errHtml = hasError ? `<div class="error-badge">⚠️ ${crons.find(j=>j.state?.consecutiveErrors>0)?.state?.lastError || 'Error'}</div>` : '';
+  return `<div class="agent-card${hasError?' error-card':''}" onclick="toggleCard(this)">
     <div class="agent-emoji">${agent.emoji}</div>
     <div class="agent-info">
       <div class="agent-name">${agent.name}</div>
       <div class="agent-role">${agent.role}</div>
       <div class="agent-meta">${tagsHtml}</div>
-      ${extra}
+      ${extra}${errHtml}
       ${cronItemsHtml(crons)}
+      ${historyHtml(crons)}
     </div>
   </div>`;
 }
 
-// ── Sidebar cron groups ────────────────────────────────────────────────────
+// ── Sidebar ────────────────────────────────────────────────────────────────
 const CRON_GROUPS = [
   { label:'Daily', ids:['daily-brief','Daily Mango Improvement Task','daily-5min-performance-prompt','daily-email-cleanup-drafts','daily-memory-template-maker','daily-memory-gap-report'] },
   { label:'Health & Infra', ids:['m365-auth-keepalive','cron-delivery-watchdog'] },
   { label:'Weekly', ids:['healthcheck:auto-update','healthcheck:security-audit','healthcheck:update-status'] },
   { label:'Monthly', ids:['Monthly Investec Statement Processor','monthly-bank-statements-pipeline','Monthly Agent Security Scan (Snyk Agent Scan)','dory-monthly-filing'] },
 ];
-
 function buildSidebar(jobs) {
   return CRON_GROUPS.map(g => {
     const rows = g.ids.map(id => jobs.find(j => j.name === id || j.id === id)).filter(Boolean);
     if (!rows.length) return '';
-    return `<div class="cron-group">
-      <div class="cron-group-label">${g.label}</div>
-      ${rows.map(j => {
-        const st = j.state?.lastRunStatus || 'idle';
-        const cls = stClass(st);
-        const name = NAMES[j.name] || j.name;
-        return `<div class="cron-row">
-          <div class="cron-status sys-dot ${cls}"></div>
-          <div class="cron-details">
-            <div class="cron-name">${name}</div>
-            <div class="cron-sched">${sched(j.schedule?.expr, j.schedule?.tz)}</div>
-          </div>
-          <div>
-            <div class="cron-last">${rel(j.state?.lastRunAtMs)}</div>
-            <div class="cron-next-time">${relNext(j.state?.nextRunAtMs)}</div>
-          </div>
-        </div>`;
-      }).join('')}
-    </div>`;
+    return `<div class="cron-group"><div class="cron-group-label">${g.label}</div>${rows.map(j => {
+      const st = j.state?.lastRunStatus || 'idle';
+      const cls = stClass(st);
+      const hasErr = (j.state?.consecutiveErrors || 0) > 0;
+      const errMsg = hasErr && j.state?.lastError && j.state.lastError !== 'disabled' ? j.state.lastError : '';
+      const d = dur(j.state?.lastDurationMs);
+      return `<div class="cron-row${hasErr?' error-row':''}">
+        <div class="cron-status sys-dot ${cls}"></div>
+        <div class="cron-details">
+          <div class="cron-name">${NAMES[j.name] || j.name}</div>
+          <div class="cron-sched">${sched(j.schedule?.expr, j.schedule?.tz)}</div>
+          ${errMsg ? `<div class="cron-error-msg">⚠️ ${errMsg}</div>` : ''}
+        </div>
+        <div class="cron-right">
+          <div class="cron-last">${rel(j.state?.lastRunAtMs)}</div>
+          <div class="cron-next-time">${relNext(j.state?.nextRunAtMs)}</div>
+          ${d ? `<div class="cron-dur-badge">${d}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('')}</div>`;
   }).join('');
 }
 
 // ── Footer ─────────────────────────────────────────────────────────────────
 function buildFooter(data) {
-  const items = [
-    { label: 'Gateway', st: data.gatewayReachable ? 'ok' : 'error', text: data.gatewayReachable ? 'Connected' : 'Unreachable' },
-    { label: 'WhatsApp', st: 'ok', text: 'Connected' },
-    { label: 'M365', st: 'idle', text: 'Auth active' },
-    { label: 'OpenClaw', st: 'ok', text: '2026.3.23-2' },
-  ];
-  return items.map(i => `<div class="sys-item"><div class="sys-dot ${i.st}"></div><span>${i.label}: ${i.text}</span></div>`).join('');
+  return [
+    { label:'Gateway', st: data.gatewayReachable ? 'ok':'error', text: data.gatewayReachable ? 'Connected':'Unreachable' },
+    { label:'WhatsApp', st:'ok', text:'Connected' },
+    { label:'M365', st:'idle', text:'Auth active' },
+    { label:'OpenClaw', st:'ok', text: data.system?.version || '—' },
+  ].map(i => `<div class="sys-item"><div class="sys-dot ${i.st}"></div><span>${i.label}: ${i.text}</span></div>`).join('');
 }
 
-// ── Dory doc counts ────────────────────────────────────────────────────────
-// Static counts from last known state — updated by Dory's monthly run
+// ── Dory counts (static, updated monthly) ─────────────────────────────────
 const DORY_COUNTS = { idPassports: 11, births: 1, schoolReports: 10, legal: 1 };
 
 // ── Fetch & render ─────────────────────────────────────────────────────────
@@ -494,16 +547,24 @@ async function fetchAndRender() {
     const data = await res.json();
     const jobs = data.cron?.jobs || [];
 
-    // Afrika Burn countdown
+    // Burn countdown
     const days = data.afrikaburn?.daysRemaining ?? Math.ceil((AFRICA_BURN - new Date()) / 86400000);
-    document.getElementById('burn-count').textContent = days > 0 ? `${days} days to Afrika Burn` : '🎉 Afrika Burn!';
+    document.getElementById('burn-count').textContent = days > 0 ? `${days} days` : '🎉 Today!';
 
-    // Gateway status
+    // Burn progress bar
+    const totalDays = Math.ceil((AFRICA_BURN - BURN_START) / 86400000);
+    const elapsed = totalDays - days;
+    const pct = Math.min(100, Math.round((elapsed / totalDays) * 100));
+    document.getElementById('burn-bar').style.width = pct + '%';
+    document.getElementById('burn-progress-pct').textContent = pct + '%';
+    document.getElementById('burn-progress-wrap').style.display = 'block';
+
+    // Gateway
     document.getElementById('mango-status').textContent = data.gatewayReachable ? '● Online' : '● Degraded';
     document.getElementById('mango-status').className = 'tag ' + (data.gatewayReachable ? 'tag-ok' : 'tag-warn');
 
-    // Agent cards
-    const extraData = { dory: DORY_COUNTS };
+    // Cards
+    const extraData = { dory: DORY_COUNTS, agents: data.agents };
     document.getElementById('family-agents').innerHTML = AGENTS.family.map(a => buildCard(a, jobs, extraData)).join('');
     document.getElementById('work-agents').innerHTML = AGENTS.work.map(a => buildCard(a, jobs, extraData)).join('');
 
