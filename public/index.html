@@ -285,7 +285,7 @@
 <script>
 const REFRESH_MS = 60000;
 const AFRICA_BURN = new Date('2026-04-27T00:00:00+02:00');
-const BURN_START = new Date('2026-01-01T00:00:00+02:00');
+
 
 // ── Theme ──────────────────────────────────────────────────────────────────
 let theme = localStorage.getItem('theme') || 'dark';
@@ -542,14 +542,6 @@ async function fetchAndRender() {
     // Burn countdown
     const days = data.afrikaburn?.daysRemaining ?? Math.ceil((AFRICA_BURN - new Date()) / 86400000);
     document.getElementById('burn-count').textContent = days > 0 ? `${days} days` : '🎉 Today!';
-
-    // Burn progress bar
-    const totalDays = Math.ceil((AFRICA_BURN - BURN_START) / 86400000);
-    const elapsed = totalDays - days;
-    const pct = Math.min(100, Math.round((elapsed / totalDays) * 100));
-    document.getElementById('burn-bar').style.width = pct + '%';
-    document.getElementById('burn-progress-pct').textContent = pct + '%';
-    document.getElementById('burn-progress-wrap').style.display = 'block';
 
     // Weather
     renderWeather(data.weather);
