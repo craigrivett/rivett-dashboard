@@ -372,6 +372,7 @@ const NAMES = {
 // ── Card expand/collapse ───────────────────────────────────────────────────
 function toggleCard(el) {
   if (el.classList.contains('ceo')) return;
+  if (el.dataset.link) { window.location.href = el.dataset.link; return; }
   el.classList.toggle('expanded');
 }
 
@@ -416,8 +417,9 @@ const AGENTS = {
   family: [
     {
       emoji:'🐠', name:'Dory', role:'Family document filing & expiry tracking',
+      link: '/dory.html',
       cronIds:['dory-monthly-filing'],
-      tags:[{l:'OneDrive',c:'idle'},{l:'Monthly',c:'idle'}],
+      tags:[{l:'OneDrive',c:'idle'},{l:'Monthly',c:'idle'},{l:'View vault →',c:'accent'}],
       extra: (data) => {
         const d = data?.dory || {};
         return `<div class="dory-stats">
@@ -472,7 +474,7 @@ function buildCard(agent, jobs, extraData) {
   const tagsHtml = agent.tags.map(t => `<span class="tag tag-${t.c}">${t.l}</span>`).join('');
   const extra = agent.extra ? agent.extra(extraData) : '';
   const errHtml = hasError ? `<div class="error-badge">⚠️ ${crons.find(j=>j.state?.consecutiveErrors>0)?.state?.lastError || 'Error'}</div>` : '';
-  return `<div class="agent-card${hasError?' error-card':''}" onclick="toggleCard(this)">
+  return `<div class="agent-card${hasError?' error-card':''}" ${agent.link ? `data-link="${agent.link}"` : ''} onclick="toggleCard(this)">
     <div class="agent-emoji">${agent.emoji}</div>
     <div class="agent-info">
       <div class="agent-name">${agent.name}</div>

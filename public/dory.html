@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dory — Document Vault</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <style>
+    [data-theme="dark"] {
+      --bg:#080810;--surface:#0f0f1a;--surface2:#14141f;--surface3:#1a1a28;
+      --border:#1e1e30;--border2:#252538;--accent:#7c6af7;
+      --green:#3ddc84;--amber:#f9a825;--red:#ff5252;--muted:#3a3a55;
+      --text:#dcdcf0;--text2:#7878a0;--text3:#4a4a6a;
+    }
+    [data-theme="light"] {
+      --bg:#f4f4f8;--surface:#fff;--surface2:#f0f0f5;--surface3:#e8e8f0;
+      --border:#dcdce8;--border2:#c8c8d8;--accent:#6654e8;
+      --green:#16a34a;--amber:#d97706;--red:#dc2626;--muted:#9090b0;
+      --text:#1a1a2e;--text2:#606080;--text3:#a0a0b8;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;min-height:100vh;}
+
+    /* Header */
+    header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+    .h-back{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text2);font-size:13px;transition:color 0.2s;}
+    .h-back:hover{color:var(--accent);}
+    .h-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;}
+    .h-meta{font-size:11px;color:var(--text2);}
+    .theme-btn{background:none;border:1px solid var(--border2);border-radius:8px;color:var(--text2);padding:4px 8px;cursor:pointer;font-size:13px;}
+
+    /* Content */
+    .page{max-width:900px;margin:0 auto;padding:24px 20px 40px;}
+
+    /* Legend */
+    .legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;}
+    .legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);}
+    .legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+    /* Section */
+    .section{margin-bottom:28px;}
+    .section-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text2);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+    .section-title span{font-size:16px;}
+
+    /* Member group */
+    .member-group{margin-bottom:20px;}
+    .member-name{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;padding-left:4px;}
+
+    /* Doc table */
+    .doc-table{width:100%;border-collapse:collapse;}
+    .doc-table th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);padding:6px 10px;text-align:left;border-bottom:1px solid var(--border);}
+    .doc-table td{padding:8px 10px;font-size:12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+    .doc-table tr:last-child td{border-bottom:none;}
+    .doc-table tr:hover td{background:var(--surface2);}
+
+    /* Status badges */
+    .badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+    .badge-ok     {background:rgba(61,220,132,0.1);color:var(--green);border:1px solid rgba(61,220,132,0.2);}
+    .badge-warn   {background:rgba(249,168,37,0.1);color:var(--amber);border:1px solid rgba(249,168,37,0.2);}
+    .badge-missing{background:rgba(255,82,82,0.1); color:var(--red);  border:1px solid rgba(255,82,82,0.2);}
+    .badge-idle   {background:rgba(58,58,85,0.3);  color:var(--text2);border:1px solid var(--border);}
+
+    /* School reports grid */
+    .reports-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+    .report-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+    .report-child{font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px;}
+    .report-year{font-size:11px;color:var(--text2);margin-bottom:4px;}
+    .report-terms{display:flex;gap:4px;}
+    .term-dot{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;}
+    .term-ok     {background:rgba(61,220,132,0.15);color:var(--green);}
+    .term-missing{background:rgba(255,82,82,0.12); color:var(--red);}
+
+    /* Summary bar */
+    .summary-bar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;}
+    .summary-pill{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;display:flex;flex-direction:column;align-items:center;min-width:80px;}
+    .summary-num{font-size:24px;font-weight:700;color:var(--text);}
+    .summary-label{font-size:10px;color:var(--text2);margin-top:2px;}
+    .summary-pill.warn .summary-num{color:var(--amber);}
+    .summary-pill.bad  .summary-num{color:var(--red);}
+    .summary-pill.good .summary-num{color:var(--green);}
+
+    @media(max-width:600px){
+      header{padding:0 14px;}
+      .page{padding:16px 12px 32px;}
+      .doc-table th:nth-child(3),.doc-table td:nth-child(3){display:none;}
+      .summary-pill{min-width:64px;padding:8px 10px;}
+      .summary-num{font-size:20px;}
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="h-back" href="/">← Back</a>
+  <div class="h-title">🐠 Dory's Document Vault</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="h-meta" id="last-updated">Loading…</div>
+    <button class="theme-btn" id="theme-btn">☀️</button>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- Summary bar -->
+  <div class="summary-bar" id="summary-bar">
+    <div class="summary-pill good"><div class="summary-num">11</div><div class="summary-label">IDs & Passports</div></div>
+    <div class="summary-pill bad"><div class="summary-num">1</div><div class="summary-label">Birth Certs</div></div>
+    <div class="summary-pill good"><div class="summary-num">10</div><div class="summary-label">School Reports</div></div>
+    <div class="summary-pill good"><div class="summary-num">1</div><div class="summary-label">Legal</div></div>
+    <div class="summary-pill bad"><div class="summary-num" id="missing-count">10</div><div class="summary-label">Missing</div></div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Filed in Dory's Backup</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Missing — not found on OneDrive</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Expiry warning (&lt;12 months)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--muted)"></div>No expiry / permanent</div>
+  </div>
+
+  <!-- IDs & Passports -->
+  <div class="section">
+    <div class="section-title"><span>🪪</span> IDs &amp; Passports</div>
+
+    <script>
+    const ID_DOCS = {
+      Craig: [
+        { type: 'SA ID', file: 'Craig ID.pdf', expiry: null, filed: true },
+        { type: 'SA Passport', file: 'CR passport.pdf', expiry: null, filed: true },
+        { type: 'Hungarian Passport', file: 'Craig hun passport.pdf', expiry: null, filed: false, missing: true },
+        { type: 'Hungarian ID', file: 'Craig Hun ID card.pdf', expiry: null, filed: true },
+      ],
+      Rebecca: [
+        { type: 'SA ID', file: 'Rebecca Rivett.pdf', expiry: null, filed: true },
+        { type: 'SA Passport', file: 'RR passport 2035.pdf', expiry: '2035', filed: false, missing: true },
+        { type: 'Hungarian Passport', file: 'Rebecca hun passport.pdf', expiry: null, filed: false, missing: true },
+        { type: 'Hungarian ID', file: 'Rebecca Hun ID card.pdf', expiry: null, filed: false, missing: true },
+        { type: 'Travel Auth', file: 'Rebecca TravelAuth.pdf', expiry: null, filed: true },
+      ],
+      Rachel: [
+        { type: 'SA Passport', file: 'Rachel passport 2028.pdf', expiry: '2028', filed: false, missing: true },
+        { type: 'Hungarian Passport', file: 'Rachel Hun passport.pdf', expiry: null, filed: false, missing: true },
+        { type: 'Hungarian ID', file: 'Rachel Hun ID card.pdf', expiry: null, filed: false, missing: true },
+        { type: 'Travel Auth', file: 'Rachel TravelAuth.pdf', expiry: null, filed: true },
+      ],
+      Lucy: [
+        { type: 'SA Passport', file: 'Lucy Rivett Passport.pdf', expiry: null, filed: false, missing: true },
+        { type: 'Hungarian Passport', file: 'Lucy Hun passport.pdf', expiry: null, filed: false, missing: true },
+        { type: 'Hungarian ID', file: 'Lucy Hun ID Card.pdf', expiry: null, filed: false, missing: true },
+        { type: 'Travel Auth', file: 'Lucy TravelAuth.pdf', expiry: null, filed: true },
+      ],
+      Emma: [
+        { type: 'SA Passport', file: 'Emma passport 2029.pdf', expiry: '2029', filed: false, missing: true },
+      ],
+    };
+    </script>
+
+    <div id="id-docs-container"></div>
+  </div>
+
+  <!-- Birth Certificates -->
+  <div class="section">
+    <div class="section-title"><span>📄</span> Birth Certificates</div>
+    <table class="doc-table">
+      <thead><tr><th>Family Member</th><th>Document</th><th>Notes</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Craig</td><td>Unabridged Birth Certificate</td><td>RSA</td><td><span class="badge badge-missing">✗ Missing</span></td></tr>
+        <tr><td>Rebecca</td><td>Unabridged Birth Certificate</td><td>RSA (maiden: Smith)</td><td><span class="badge badge-missing">✗ Missing</span></td></tr>
+        <tr><td>Rachel</td><td>Birth Certificate</td><td>RSA</td><td><span class="badge badge-ok">✓ Filed</span></td></tr>
+        <tr><td>Lucy</td><td>Birth Certificate</td><td>RSA</td><td><span class="badge badge-ok">✓ Filed</span></td></tr>
+        <tr><td>Emma</td><td>Birth Certificate</td><td>RSA</td><td><span class="badge badge-ok">✓ Filed</span></td></tr>
+        <tr><td>Emma</td><td>Birth Cert + Apostille</td><td>For international use</td><td><span class="badge badge-missing">✗ Missing</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Marriage & Legal -->
+  <div class="section">
+    <div class="section-title"><span>⚖️</span> Marriage &amp; Legal</div>
+    <table class="doc-table">
+      <thead><tr><th>Document</th><th>Parties</th><th>Expiry</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Marriage Certificate</td><td>Craig &amp; Rebecca</td><td>—</td><td><span class="badge badge-idle">In Dory's Backup</span></td></tr>
+        <tr><td>ANC / Prenuptial Agreement</td><td>Craig &amp; Rebecca</td><td>—</td><td><span class="badge badge-missing">✗ Not found on OneDrive</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- School Reports -->
+  <div class="section">
+    <div class="section-title"><span>🏫</span> School Reports — Bridge House</div>
+    <div class="reports-grid" id="reports-grid"></div>
+  </div>
+
+</div>
+
+<script>
+// ── Theme ──────────────────────────────────────────────────────────────────
+let theme = localStorage.getItem('theme') || 'dark';
+document.documentElement.setAttribute('data-theme', theme);
+document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+document.getElementById('theme-btn').addEventListener('click', () => {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('theme', theme);
+});
+
+// ── Expiry helper ─────────────────────────────────────────────────────────
+function expiryBadge(expiry) {
+  if (!expiry) return '<span class="badge badge-idle">No expiry</span>';
+  const yr = parseInt(expiry);
+  const now = new Date().getFullYear();
+  if (yr - now <= 0) return `<span class="badge badge-missing">Expired ${expiry}</span>`;
+  if (yr - now <= 1) return `<span class="badge badge-warn">⚠ Expires ${expiry}</span>`;
+  return `<span class="badge badge-ok">Expires ${expiry}</span>`;
+}
+
+// ── Build ID/Passport tables ───────────────────────────────────────────────
+const container = document.getElementById('id-docs-container');
+for (const [member, docs] of Object.entries(ID_DOCS)) {
+  const rows = docs.map(d => {
+    const status = d.missing
+      ? '<span class="badge badge-missing">✗ Missing</span>'
+      : '<span class="badge badge-ok">✓ Filed</span>';
+    const expiry = expiryBadge(d.expiry);
+    return `<tr>
+      <td>${d.type}</td>
+      <td style="color:var(--text2);font-size:11px">${d.file}</td>
+      <td>${expiry}</td>
+      <td>${status}</td>
+    </tr>`;
+  }).join('');
+  container.innerHTML += `
+    <div class="member-group">
+      <div class="member-name">${member}</div>
+      <table class="doc-table">
+        <thead><tr><th>Type</th><th>File</th><th>Expiry</th><th>Status</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+// ── School reports grid ────────────────────────────────────────────────────
+const REPORTS = {
+  Rachel: {
+    2023: { T1: true,  T2: true,  T3: true,  T4: true  },
+    2024: { T1: true,  T2: true,  T3: true,  T4: true  },
+    2025: { T1: true,  T2: false, T3: false, T4: false  },
+    2026: { T1: true,  T2: false, T3: false, T4: false  },
+  },
+  Lucy: {
+    2023: { T1: false, T2: true,  T3: false, T4: true  },
+    2024: { T1: false, T2: true,  T3: false, T4: true  },
+    2025: { T1: false, T2: false, T3: false, T4: false },
+    2026: { T1: true,  T2: false, T3: false, T4: false },
+  },
+};
+
+const grid = document.getElementById('reports-grid');
+for (const [child, years] of Object.entries(REPORTS)) {
+  for (const [year, terms] of Object.entries(years)) {
+    const termsHtml = Object.entries(terms).map(([t, has]) =>
+      `<div class="term-dot ${has ? 'term-ok' : 'term-missing'}">${t.replace('T','')}</div>`
+    ).join('');
+    const allHave = Object.values(terms).every(Boolean);
+    const someHave = Object.values(terms).some(Boolean);
+    grid.innerHTML += `
+      <div class="report-card">
+        <div class="report-child">${child}</div>
+        <div class="report-year">${year}</div>
+        <div class="report-terms">${termsHtml}</div>
+        <div style="margin-top:6px">${allHave ? '<span class="badge badge-ok">Complete</span>' : someHave ? '<span class="badge badge-warn">Partial</span>' : '<span class="badge badge-missing">Missing</span>'}</div>
+      </div>`;
+  }
+}
+
+// ── Last updated ───────────────────────────────────────────────────────────
+document.getElementById('last-updated').textContent = 'Last sync: 27 Mar 2026';
+</script>
+</body>
+</html>
