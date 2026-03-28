@@ -40,7 +40,7 @@ module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Content-Type', 'application/json');
   const result = await fetchShim();
-  const burnDays = Math.max(0, Math.ceil((new Date('2026-04-27T00:00:00+02:00') - Date.now()) / 86400000));
+  const burnDays = Math.max(0, Math.ceil((new Date('2026-04-30T00:00:00+02:00') - Date.now()) / 86400000));
   if (result.ok) {
     res.end(JSON.stringify(result.data));
   } else {
