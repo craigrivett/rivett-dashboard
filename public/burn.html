@@ -146,6 +146,26 @@
     <div style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center">Tap to open ticket PDF · Gate opens Mon 27 Apr 09:00</div>
   </div>
 
+  <!-- Weather -->
+  <div class="section" style="text-align:left">
+    <div class="section-title"><span>🌤️</span> Tankwa Karoo Weather</div>
+    <div id="weather-card" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px" id="weather-grid">
+        <div style="text-align:center;padding:8px">
+          <div style="font-size:32px;font-weight:800;color:var(--burn)" id="w-temp">--</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px" id="w-desc">Loading...</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;justify-content:center">
+          <div style="font-size:12px;color:var(--text2)">🌡️ High <span id="w-high" style="color:var(--text);font-weight:600">--</span> · Low <span id="w-low" style="color:var(--text);font-weight:600">--</span></div>
+          <div style="font-size:12px;color:var(--text2)">💨 Wind <span id="w-wind" style="color:var(--text);font-weight:600">--</span></div>
+          <div style="font-size:12px;color:var(--text2)">💧 Humidity <span id="w-humidity" style="color:var(--text);font-weight:600">--</span></div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px;text-align:right" id="w-updated"></div>
+    </div>
+    <div id="weather-forecast" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"></div>
+  </div>
+
   <!-- Checklist -->
   <div class="section">
     <div class="section-title"><span>🎒</span> Packing Checklist</div>
@@ -228,6 +248,38 @@ ITEMS.forEach((item, i) => {
   });
   list.appendChild(div);
 });
+
+// Tankwa weather via wttr.in
+async function loadWeather() {
+  try {
+    const res = await fetch('https://wttr.in/Tankwa+Karoo,South+Africa?format=j1');
+    const d = await res.json();
+    const curr = d.current_condition[0];
+    const today = d.weather[0];
+    document.getElementById('w-temp').textContent = curr.temp_C + '°C';
+    document.getElementById('w-desc').textContent = curr.weatherDesc[0].value;
+    document.getElementById('w-high').textContent = today.maxtempC + '°C';
+    document.getElementById('w-low').textContent = today.mintempC + '°C';
+    document.getElementById('w-wind').textContent = curr.windspeedKmph + ' km/h ' + curr.winddir16Point;
+    document.getElementById('w-humidity').textContent = curr.humidity + '%';
+    document.getElementById('w-updated').textContent = 'Updated just now · Tankwa Karoo';
+    // 3-day forecast
+    const fc = document.getElementById('weather-forecast');
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    d.weather.forEach((w, i) => {
+      const date = new Date(w.date);
+      const label = i === 0 ? 'Today' : days[date.getDay()];
+      const desc = w.hourly[4]?.weatherDesc[0]?.value || '';
+      const div = document.createElement('div');
+      div.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;min-width:80px;text-align:center';
+      div.innerHTML = `<div style="font-weight:700;color:var(--text2)">${label}</div><div style="font-size:18px;font-weight:800;color:var(--burn);margin:4px 0">${w.maxtempC}°</div><div style="font-size:10px;color:var(--text3)">${w.mintempC}° low</div><div style="font-size:10px;color:var(--text2);margin-top:2px">${desc.split(' ').slice(0,2).join(' ')}</div>`;
+      fc.appendChild(div);
+    });
+  } catch(e) {
+    document.getElementById('w-desc').textContent = 'Weather unavailable';
+  }
+}
+loadWeather();
 </script>
 </body>
 </html>
