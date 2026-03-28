@@ -234,9 +234,10 @@ ITEMS.forEach((item, i) => {
   list.appendChild(div);
 });
 
-// Tankwa weather via wttr.in
+// Tankwa weather
 async function loadWeather() {
   try {
+    // Current conditions via wttr.in
     const res = await fetch('https://wttr.in/Tankwa+Karoo,South+Africa?format=j1');
     const d = await res.json();
     const curr = d.current_condition[0];
@@ -246,18 +247,41 @@ async function loadWeather() {
     document.getElementById('wi-high').textContent = today.maxtempC + '°C';
     document.getElementById('wi-low').textContent = today.mintempC + '°C';
     document.getElementById('wi-wind').textContent = curr.windspeedKmph + ' km/h ' + curr.winddir16Point;
-    const fc = document.getElementById('wi-forecast');
-    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    d.weather.forEach((w, i) => {
-      const date = new Date(w.date);
-      const label = i === 0 ? 'Today' : days[date.getDay()];
+  } catch(e) {
+    document.getElementById('wi-desc').textContent = 'Weather unavailable';
+  }
+
+  // Burn-day forecast via Open-Meteo (available ~14 days out)
+  const fc = document.getElementById('wi-forecast');
+  const burnDays = ['2026-04-30','2026-05-01','2026-05-02'];
+  const burnLabels = ['Thu 30 Apr','Fri 1 May','Sat 2 May'];
+  const daysUntilBurn = Math.floor((new Date('2026-04-30T00:00:00+02:00') - Date.now()) / 86400000);
+
+  if (daysUntilBurn > 16) {
+    const note = document.createElement('div');
+    note.style.cssText = 'font-size:11px;color:var(--text3);display:flex;align-items:center;padding:4px 8px;background:var(--surface);border:1px solid var(--border);border-radius:8px';
+    note.textContent = `Burn-day forecast available in ~${daysUntilBurn - 14} days`;
+    fc.appendChild(note);
+    return;
+  }
+
+  try {
+    const omRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=-32.2&longitude=19.8&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max,weathercode&timezone=Africa%2FJohannesburg&start_date=2026-04-30&end_date=2026-05-02`);
+    const om = await omRes.json();
+    const wCodes = {0:'☀️ Clear',1:'🌤️ Mainly clear',2:'⛅ Partly cloudy',3:'☁️ Overcast',45:'🌫️ Foggy',51:'🌦️ Drizzle',61:'🌧️ Light rain',63:'🌧️ Rain',71:'❄️ Snow',80:'🌦️ Showers',95:'⛈️ Storm'};
+    om.daily.time.forEach((date, i) => {
       const div = document.createElement('div');
-      div.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:11px;text-align:center;min-width:60px';
-      div.innerHTML = `<div style="font-weight:700;color:var(--text2)">${label}</div><div style="font-size:16px;font-weight:800;color:var(--burn);margin:2px 0">${w.maxtempC}°</div><div style="color:var(--text3)">${w.mintempC}°</div>`;
+      div.style.cssText = 'background:var(--surface);border:1px solid var(--burn);border-radius:8px;padding:8px 12px;font-size:11px;text-align:center;min-width:90px';
+      const code = om.daily.weathercode[i];
+      const desc = wCodes[code] || '🌡️';
+      div.innerHTML = `<div style="font-weight:700;color:var(--burn);font-size:10px">${burnLabels[i]}</div><div style="margin:3px 0;font-size:13px">${desc.split(' ')[0]}</div><div style="font-size:13px;font-weight:800;color:var(--text)">${om.daily.temperature_2m_max[i]}° / ${om.daily.temperature_2m_min[i]}°</div><div style="color:var(--text3);margin-top:2px">💨 ${om.daily.windspeed_10m_max[i]}km/h · 🌧️ ${om.daily.precipitation_probability_max[i]}%</div>`;
       fc.appendChild(div);
     });
   } catch(e) {
-    document.getElementById('wi-desc').textContent = 'Weather unavailable';
+    const note = document.createElement('div');
+    note.style.cssText = 'font-size:11px;color:var(--text3);padding:4px 8px';
+    note.textContent = 'Burn forecast unavailable';
+    fc.appendChild(note);
   }
 }
 loadWeather();
