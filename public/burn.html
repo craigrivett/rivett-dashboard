@@ -59,11 +59,20 @@
     <div class="hero-sub">AfrikaBurn 2026 · Tankwa Karoo · 27 Apr – 3 May</div>
     <div class="countdown">
       <div class="count-unit"><div class="count-num" id="cd-days">--</div><div class="count-label">Days</div></div>
-      <div class="count-unit"><div class="count-num" id="cd-hours">--</div><div class="count-label">Hours</div></div>
-      <div class="count-unit"><div class="count-num" id="cd-mins">--</div><div class="count-label">Minutes</div></div>
-      <div class="count-unit"><div class="count-num" id="cd-secs">--</div><div class="count-label">Seconds</div></div>
     </div>
     <div class="date-line">Monday 27 April – Sunday 3 May 2026 · Tankwa Karoo, between Northern Cape &amp; Western Cape</div>
+
+    <!-- Inline weather under countdown -->
+    <div id="weather-inline" style="margin-top:20px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 18px;display:flex;align-items:center;gap:10px">
+        <div style="font-size:22px;font-weight:800;color:var(--burn2)" id="wi-temp">--</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text)" id="wi-desc">Loading...</div>
+          <div style="font-size:11px;color:var(--text2)">🌡️ <span id="wi-high">--</span> / <span id="wi-low">--</span> · 💨 <span id="wi-wind">--</span></div>
+        </div>
+      </div>
+      <div id="wi-forecast" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"></div>
+    </div>
   </div>
 
   <!-- Theme -->
@@ -146,26 +155,6 @@
     <div style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center">Tap to open ticket PDF · Gate opens Mon 27 Apr 09:00</div>
   </div>
 
-  <!-- Weather -->
-  <div class="section" style="text-align:left">
-    <div class="section-title"><span>🌤️</span> Tankwa Karoo Weather</div>
-    <div id="weather-card" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;">
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px" id="weather-grid">
-        <div style="text-align:center;padding:8px">
-          <div style="font-size:32px;font-weight:800;color:var(--burn)" id="w-temp">--</div>
-          <div style="font-size:11px;color:var(--text2);margin-top:2px" id="w-desc">Loading...</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;justify-content:center">
-          <div style="font-size:12px;color:var(--text2)">🌡️ High <span id="w-high" style="color:var(--text);font-weight:600">--</span> · Low <span id="w-low" style="color:var(--text);font-weight:600">--</span></div>
-          <div style="font-size:12px;color:var(--text2)">💨 Wind <span id="w-wind" style="color:var(--text);font-weight:600">--</span></div>
-          <div style="font-size:12px;color:var(--text2)">💧 Humidity <span id="w-humidity" style="color:var(--text);font-weight:600">--</span></div>
-        </div>
-      </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:10px;text-align:right" id="w-updated"></div>
-    </div>
-    <div id="weather-forecast" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"></div>
-  </div>
-
   <!-- Checklist -->
   <div class="section">
     <div class="section-title"><span>🎒</span> Packing Checklist</div>
@@ -175,18 +164,14 @@
 
 </div>
 <script>
-const BURN_DATE = new Date('2026-04-27T10:00:00+02:00'); // Gates open ~10am SAST
+const BURN_DATE = new Date('2026-04-30T00:00:00+02:00');
 
 function updateCountdown() {
   const diff = BURN_DATE - Date.now();
   if (diff <= 0) { document.querySelector('.countdown').innerHTML = '<div style="font-size:24px;color:var(--burn);font-weight:800">🎉 IT\'S BURN TIME!</div>'; return; }
-  const s = Math.floor(diff / 1000);
-  document.getElementById('cd-days').textContent = String(Math.floor(s / 86400)).padStart(2,'0');
-  document.getElementById('cd-hours').textContent = String(Math.floor((s % 86400) / 3600)).padStart(2,'0');
-  document.getElementById('cd-mins').textContent = String(Math.floor((s % 3600) / 60)).padStart(2,'0');
-  document.getElementById('cd-secs').textContent = String(s % 60).padStart(2,'0');
+  document.getElementById('cd-days').textContent = Math.floor(diff / 86400000);
 }
-setInterval(updateCountdown, 1000); updateCountdown();
+updateCountdown(); setInterval(updateCountdown, 60000);
 
 // Theme
 let theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
@@ -256,27 +241,23 @@ async function loadWeather() {
     const d = await res.json();
     const curr = d.current_condition[0];
     const today = d.weather[0];
-    document.getElementById('w-temp').textContent = curr.temp_C + '°C';
-    document.getElementById('w-desc').textContent = curr.weatherDesc[0].value;
-    document.getElementById('w-high').textContent = today.maxtempC + '°C';
-    document.getElementById('w-low').textContent = today.mintempC + '°C';
-    document.getElementById('w-wind').textContent = curr.windspeedKmph + ' km/h ' + curr.winddir16Point;
-    document.getElementById('w-humidity').textContent = curr.humidity + '%';
-    document.getElementById('w-updated').textContent = 'Updated just now · Tankwa Karoo';
-    // 3-day forecast
-    const fc = document.getElementById('weather-forecast');
+    document.getElementById('wi-temp').textContent = curr.temp_C + '°C';
+    document.getElementById('wi-desc').textContent = curr.weatherDesc[0].value;
+    document.getElementById('wi-high').textContent = today.maxtempC + '°C';
+    document.getElementById('wi-low').textContent = today.mintempC + '°C';
+    document.getElementById('wi-wind').textContent = curr.windspeedKmph + ' km/h ' + curr.winddir16Point;
+    const fc = document.getElementById('wi-forecast');
     const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     d.weather.forEach((w, i) => {
       const date = new Date(w.date);
       const label = i === 0 ? 'Today' : days[date.getDay()];
-      const desc = w.hourly[4]?.weatherDesc[0]?.value || '';
       const div = document.createElement('div');
-      div.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;min-width:80px;text-align:center';
-      div.innerHTML = `<div style="font-weight:700;color:var(--text2)">${label}</div><div style="font-size:18px;font-weight:800;color:var(--burn);margin:4px 0">${w.maxtempC}°</div><div style="font-size:10px;color:var(--text3)">${w.mintempC}° low</div><div style="font-size:10px;color:var(--text2);margin-top:2px">${desc.split(' ').slice(0,2).join(' ')}</div>`;
+      div.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:11px;text-align:center;min-width:60px';
+      div.innerHTML = `<div style="font-weight:700;color:var(--text2)">${label}</div><div style="font-size:16px;font-weight:800;color:var(--burn);margin:2px 0">${w.maxtempC}°</div><div style="color:var(--text3)">${w.mintempC}°</div>`;
       fc.appendChild(div);
     });
   } catch(e) {
-    document.getElementById('w-desc').textContent = 'Weather unavailable';
+    document.getElementById('wi-desc').textContent = 'Weather unavailable';
   }
 }
 loadWeather();
