@@ -105,6 +105,29 @@
     .inv-due.ok{color:var(--text3);}
     .inv-due.paid{color:var(--green);}
 
+    /* Receipt image modal */
+    .receipt-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+    .receipt-modal-overlay.open{opacity:1;pointer-events:all;}
+    .receipt-modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;max-width:560px;width:calc(100% - 32px);max-height:90vh;display:flex;flex-direction:column;overflow:hidden;}
+    .receipt-modal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+    .receipt-modal-title{font-size:14px;font-weight:700;}
+    .receipt-modal-sub{font-size:11px;color:var(--text2);margin-top:2px;}
+    .receipt-modal-close{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text2);width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .receipt-modal-close:hover{color:var(--text);}
+    .receipt-modal-img-wrap{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--surface2);}
+    .receipt-modal-img{max-width:100%;max-height:65vh;object-fit:contain;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,0.4);}
+    .receipt-modal-no-img{text-align:center;padding:40px 20px;color:var(--text3);}
+    .receipt-modal-no-img .emoji{font-size:48px;margin-bottom:10px;}
+    .receipt-modal-details{padding:14px 18px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:8px;flex-shrink:0;}
+    .receipt-detail{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;}
+    .receipt-detail-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);}
+    .receipt-detail-value{font-size:13px;font-weight:600;margin-top:3px;}
+
+    /* Row clickable */
+    .exp-table tr.has-image td{cursor:pointer;}
+    .exp-table tr.has-image:hover td{background:var(--surface2);}
+    .img-indicator{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--accent);margin-left:6px;}
+
     /* Empty state */
     .empty-state{text-align:center;padding:40px 20px;color:var(--text3);}
     .empty-state .emoji{font-size:48px;margin-bottom:12px;}
@@ -216,6 +239,23 @@
     </div>
   </div>
 
+</div>
+
+<!-- Receipt image modal -->
+<div class="receipt-modal-overlay" id="receipt-modal">
+  <div class="receipt-modal">
+    <div class="receipt-modal-header">
+      <div>
+        <div class="receipt-modal-title" id="rm-title">Receipt</div>
+        <div class="receipt-modal-sub" id="rm-sub"></div>
+      </div>
+      <button class="receipt-modal-close" onclick="closeReceiptModal()">✕</button>
+    </div>
+    <div class="receipt-modal-img-wrap" id="rm-img-wrap">
+      <div class="receipt-modal-no-img"><div class="emoji">🧾</div><p>Loading…</p></div>
+    </div>
+    <div class="receipt-modal-details" id="rm-details"></div>
+  </div>
 </div>
 
 <script>
@@ -425,13 +465,15 @@ function renderPage(data) {
   // Expenses table
   const rows = expenses.slice(0, 50);
   if (rows.length > 0) {
-    document.getElementById('exp-tbody').innerHTML = rows.map(e => {
+    document.getElementById('exp-tbody').innerHTML = rows.map((e, i) => {
       const catType = (e.category||'').toLowerCase().includes('business') ? 'business' : 'household';
       const filedCls = e.receiptFiled === 'Yes' ? 'filed-yes' : 'filed-no';
       const filedIcon = e.receiptFiled === 'Yes' ? '✅' : e.receiptFiled === 'Unclear' ? '⚠️' : '❌';
-      return `<tr>
+      const hasImg = !!(e.imageUrl || e.onedrivePath);
+      const imgIndicator = hasImg ? `<span class="img-indicator">🖼️</span>` : '';
+      return `<tr class="${hasImg ? 'has-image' : ''}" ${hasImg ? `onclick="openReceiptModal(${i})"` : ''} data-idx="${i}">
         <td>${e.date||'—'}</td>
-        <td>${e.vendor||'—'}</td>
+        <td>${e.vendor||'—'}${imgIndicator}</td>
         <td class="amount-cell">${fmt(e.amount)}</td>
         <td><span class="badge badge-${catType}">${e.category||'—'}</span></td>
         <td style="color:var(--text2)">${e.description||'—'}</td>
@@ -441,6 +483,61 @@ function renderPage(data) {
   } else {
     renderEmpty();
   }
+}
+
+// ── Receipt modal ──────────────────────────────────────────────────────────
+let ALL_EXPENSES = [];
+
+function openReceiptModal(idx) {
+  const e = ALL_EXPENSES[idx];
+  if (!e) return;
+
+  document.getElementById('rm-title').textContent = e.vendor || 'Receipt';
+  document.getElementById('rm-sub').textContent = `${e.date || '—'} · ${fmt(e.amount)} · ${e.category || ''}`;
+
+  // Image
+  const imgWrap = document.getElementById('rm-img-wrap');
+  if (e.imageUrl) {
+    imgWrap.innerHTML = `<img class="receipt-modal-img" src="${e.imageUrl}" alt="Receipt image" onerror="this.parentElement.innerHTML='<div class=\\'receipt-modal-no-img\\'><div class=\\'emoji\\'>🖼️</div><p>Image could not be loaded.<br><small>${e.imageUrl}</small></p></div>'" />`;
+  } else if (e.onedrivePath) {
+    imgWrap.innerHTML = `<div class="receipt-modal-no-img"><div class="emoji">📁</div><p>Filed to OneDrive:<br><small style="word-break:break-all">${e.onedrivePath}</small><br><br><a href="${e.onedriveUrl||'#'}" target="_blank" style="color:var(--accent)">Open in OneDrive →</a></p></div>`;
+  } else {
+    imgWrap.innerHTML = `<div class="receipt-modal-no-img"><div class="emoji">🧾</div><p>No image stored for this entry.<br><small style="color:var(--text3)">Images will appear here once Harry saves them to OneDrive.</small></p></div>`;
+  }
+
+  // Details
+  const details = [
+    ['Vendor', e.vendor || '—'],
+    ['Amount', fmt(e.amount)],
+    ['Date', e.date || '—'],
+    ['Category', `${e.category || '—'}${e.subcategory ? ' › ' + e.subcategory : ''}`],
+    ['Paid By', e.paidBy || '—'],
+    ['Receipt Filed', e.receiptFiled || '—'],
+  ];
+  if (e.notes) details.push(['Notes', e.notes]);
+  document.getElementById('rm-details').innerHTML = details.map(([l,v]) =>
+    `<div class="receipt-detail"><div class="receipt-detail-label">${l}</div><div class="receipt-detail-value">${v}</div></div>`
+  ).join('');
+
+  document.getElementById('receipt-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeReceiptModal() {
+  document.getElementById('receipt-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('receipt-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeReceiptModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeReceiptModal(); });
+
+// Patch renderPage to store expenses for modal
+const _origRenderPage = renderPage;
+function renderPage(data) {
+  ALL_EXPENSES = data.expenses || [];
+  _origRenderPage(data);
 }
 
 loadData();
