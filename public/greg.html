@@ -103,6 +103,46 @@
     .val-high{color:var(--amber);}
     .val-ok{color:var(--green);}
 
+    /* Recent activities */
+    .act-list{display:flex;flex-direction:column;gap:8px;}
+    .act-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color 0.2s,background 0.2s;}
+    .act-row:hover{border-color:var(--accent);background:var(--surface2);}
+    .act-icon{font-size:22px;width:36px;text-align:center;flex-shrink:0;}
+    .act-main{flex:1;min-width:0;}
+    .act-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .act-meta{font-size:11px;color:var(--text2);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap;}
+    .act-meta span{display:flex;align-items:center;gap:3px;}
+    .act-right{flex-shrink:0;text-align:right;}
+    .act-dur{font-size:13px;font-weight:600;color:var(--text);}
+    .act-date{font-size:10px;color:var(--text3);margin-top:2px;}
+    .act-badge-run{background:rgba(79,195,247,0.1);color:rgba(79,195,247,0.9);border:1px solid rgba(79,195,247,0.2);font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;}
+    .act-badge-gym{background:rgba(124,106,247,0.1);color:var(--accent);border:1px solid rgba(124,106,247,0.2);font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;}
+    .act-badge-z2{background:rgba(61,220,132,0.1);color:var(--green);border:1px solid rgba(61,220,132,0.2);font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-left:4px;}
+    .act-chevron{color:var(--text3);font-size:14px;margin-left:6px;}
+
+    /* Modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+    .modal-overlay.open{opacity:1;pointer-events:all;}
+    .modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px 16px 0 0;width:100%;max-width:640px;max-height:85vh;overflow-y:auto;padding:24px;transform:translateY(40px);transition:transform 0.25s ease;}
+    .modal-overlay.open .modal{transform:translateY(0);}
+    .modal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;}
+    .modal-title{font-size:17px;font-weight:700;}
+    .modal-sub{font-size:12px;color:var(--text2);margin-top:3px;}
+    .modal-close{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text2);width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .modal-close:hover{color:var(--text);}
+    .modal-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:18px;}
+    .modal-stat{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+    .modal-stat-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);}
+    .modal-stat-value{font-size:18px;font-weight:700;margin-top:4px;}
+    .modal-stat-unit{font-size:11px;color:var(--text2);}
+    .modal-notes{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;line-height:1.6;color:var(--text2);margin-bottom:14px;}
+    .modal-sets-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text2);margin-bottom:10px;}
+    .modal-sets-table{width:100%;border-collapse:collapse;}
+    .modal-sets-table th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);padding:5px 10px;border-bottom:1px solid var(--border);text-align:left;}
+    .modal-sets-table td{font-size:12px;padding:7px 10px;border-bottom:1px solid var(--border);}
+    .modal-sets-table tr:last-child td{border-bottom:none;}
+    .modal-sets-table tr:hover td{background:var(--surface3);}
+
     /* data-as-of */
     .data-as-of{font-size:11px;color:var(--text3);margin-bottom:20px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;gap:8px;}
 
@@ -295,6 +335,14 @@
     </div>
   </div>
 
+  <!-- Recent activities -->
+  <div class="section">
+    <div class="section-title"><span>⚡</span> Recent Activities</div>
+    <div class="act-list" id="act-list">
+      <div style="color:var(--text3);font-size:12px;padding:12px">Loading activities…</div>
+    </div>
+  </div>
+
   <!-- Health goals -->
   <div class="section">
     <div class="section-title"><span>🎯</span> Health Priorities</div>
@@ -342,6 +390,13 @@
     </div>
   </div>
 
+</div>
+
+<!-- Activity detail modal -->
+<div class="modal-overlay" id="act-modal" role="dialog" aria-modal="true">
+  <div class="modal" id="act-modal-body">
+    <!-- filled by JS -->
+  </div>
 </div>
 
 <script>
@@ -393,6 +448,11 @@ async function loadLiveData() {
     if (data.rhr && data.rhr.length > 0) {
       RHR_DATA.splice(0, RHR_DATA.length, ...data.rhr);
       drawRHR();
+    }
+
+    // Recent activities
+    if (data.recentActivities && data.recentActivities.length > 0) {
+      renderActivities(data.recentActivities);
     }
 
     // Alerts banner
@@ -524,9 +584,138 @@ function drawRHR() {
 
 window.addEventListener('resize', drawRHR);
 drawRHR();
+
+// Seed fallback activities (shown until live data loads or if API is down)
+const FALLBACK_ACTIVITIES = [
+  {id:'act-001',date:'2026-03-28',dateLabel:'Fri 28 Mar',type:'Gym',typeIcon:'🏋️',name:'Upper Body — Push',durationMin:52,avgHR:128,maxHR:158,calories:380,notes:'Bench press 4×8 @ 85kg. Shoulder press 3×10. Cable flyes. Tricep dips.',sets:[{exercise:'Bench Press',sets:4,reps:8,weight:'85kg'},{exercise:'Shoulder Press',sets:3,reps:10,weight:'60kg'},{exercise:'Cable Flyes',sets:3,reps:12,weight:'15kg/side'},{exercise:'Tricep Dips',sets:3,reps:12,weight:'BW'},{exercise:'Lateral Raises',sets:3,reps:15,weight:'10kg'}]},
+  {id:'act-002',date:'2026-03-26',dateLabel:'Wed 26 Mar',type:'Run',typeIcon:'🏃',name:'Zone 2 Easy Run',durationMin:42,distance:6.1,distanceUnit:'km',avgHR:138,maxHR:149,pace:'6:53/km',calories:430,zone2:true,notes:'Solid Zone 2 effort. HR stayed in target band 133–143 for most of it. Slight drift last 1km.'},
+  {id:'act-003',date:'2026-03-25',dateLabel:'Tue 25 Mar',type:'Gym',typeIcon:'🏋️',name:'Legs — Quad Focus',durationMin:58,avgHR:132,maxHR:164,calories:460,notes:'Squats felt heavy post-run. Reduced weight slightly. Good pump by end.',sets:[{exercise:'Barbell Squat',sets:4,reps:8,weight:'100kg'},{exercise:'Leg Press',sets:3,reps:12,weight:'180kg'},{exercise:'Leg Extension',sets:3,reps:15,weight:'60kg'},{exercise:'Romanian Deadlift',sets:3,reps:10,weight:'80kg'},{exercise:'Calf Raises',sets:4,reps:20,weight:'60kg'}]},
+  {id:'act-004',date:'2026-03-23',dateLabel:'Sun 23 Mar',type:'Gym',typeIcon:'🏋️',name:'Back & Biceps',durationMin:55,avgHR:124,maxHR:152,calories:410,notes:'Pull-day. Deadlift working set at 120kg. Good mind-muscle on rows.',sets:[{exercise:'Deadlift',sets:3,reps:6,weight:'120kg'},{exercise:'Bent-over Row',sets:4,reps:8,weight:'75kg'},{exercise:'Lat Pulldown',sets:3,reps:10,weight:'70kg'},{exercise:'Seated Cable Row',sets:3,reps:12,weight:'65kg'},{exercise:'Barbell Curl',sets:3,reps:10,weight:'35kg'}]},
+  {id:'act-005',date:'2026-03-21',dateLabel:'Fri 21 Mar',type:'Run',typeIcon:'🏃',name:'Zone 2 Easy Run',durationMin:45,distance:6.5,distanceUnit:'km',avgHR:143,maxHR:153,pace:'6:55/km',calories:455,zone2:true,notes:'HR slightly high — avg 143 is top of Zone 2 band. Felt good though. Humidity was a factor.'},
+  {id:'act-006',date:'2026-03-19',dateLabel:'Wed 19 Mar',type:'Gym',typeIcon:'🏋️',name:'Upper Body — Push',durationMin:50,avgHR:126,maxHR:155,calories:365,notes:'Decent session. Slightly fatigued from Tuesday run. Kept it moderate.',sets:[{exercise:'Incline Bench Press',sets:4,reps:8,weight:'75kg'},{exercise:'Dumbbell Shoulder Press',sets:3,reps:10,weight:'28kg'},{exercise:'Pec Deck',sets:3,reps:12,weight:'55kg'},{exercise:'Overhead Tricep Extension',sets:3,reps:12,weight:'25kg'},{exercise:'Face Pulls',sets:3,reps:15,weight:'20kg'}]},
+  {id:'act-007',date:'2026-03-17',dateLabel:'Mon 17 Mar',type:'Run',typeIcon:'🏃',name:'Easy Recovery Run',durationMin:30,distance:4.2,distanceUnit:'km',avgHR:135,maxHR:148,pace:'7:08/km',calories:295,zone2:true,notes:'Short recovery run. Easy pace. Heart rate behaved well.'},
+  {id:'act-008',date:'2026-03-15',dateLabel:'Sat 15 Mar',type:'Gym',typeIcon:'🏋️',name:'Legs — Posterior Chain',durationMin:60,avgHR:135,maxHR:168,calories:490,notes:'Strong session. Deadlift PR attempt — got 125kg for 3 clean reps.',sets:[{exercise:'Deadlift (PR attempt)',sets:3,reps:3,weight:'125kg'},{exercise:'Hip Thrust',sets:4,reps:12,weight:'100kg'},{exercise:'Leg Curl',sets:3,reps:12,weight:'55kg'},{exercise:'Good Mornings',sets:3,reps:10,weight:'40kg'},{exercise:'Nordic Curls',sets:3,reps:8,weight:'BW'}]},
+  {id:'act-009',date:'2026-03-13',dateLabel:'Thu 13 Mar',type:'Gym',typeIcon:'🏋️',name:'Back & Biceps',durationMin:48,avgHR:121,maxHR:149,calories:355,notes:'First Retatrutide dose day. Felt slightly nauseous mid-session — pushed through. Normal adaptation.',sets:[{exercise:'Pull-ups',sets:4,reps:8,weight:'BW'},{exercise:'T-Bar Row',sets:4,reps:8,weight:'60kg'},{exercise:'Single-arm Dumbbell Row',sets:3,reps:10,weight:'32kg'},{exercise:'Hammer Curl',sets:3,reps:12,weight:'16kg'},{exercise:'Reverse Curl',sets:3,reps:12,weight:'25kg'}]},
+  {id:'act-010',date:'2026-03-11',dateLabel:'Tue 11 Mar',type:'Run',typeIcon:'🏃',name:'Zone 2 Tempo Run',durationMin:50,distance:7.3,distanceUnit:'km',avgHR:141,maxHR:158,pace:'6:51/km',calories:510,zone2:true,notes:'Longest run in a while. HR crept above Zone 2 in last 15 min. Good aerobic stimulus.'},
+];
+renderActivities(FALLBACK_ACTIVITIES);
+
 loadLiveData();
 
-// ── Activity table ─────────────────────────────────────────────────────────
+// ── Recent Activities ──────────────────────────────────────────────────────
+let RECENT_ACTIVITIES = [];
+
+function fmtDur(min) {
+  if (!min) return '—';
+  const h = Math.floor(min / 60), m = min % 60;
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+function renderActivities(acts) {
+  const list = document.getElementById('act-list');
+  if (!acts || acts.length === 0) {
+    list.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:12px">No recent activities found.</div>';
+    return;
+  }
+  RECENT_ACTIVITIES = acts;
+  list.innerHTML = acts.map((a, i) => {
+    const isRun = a.type === 'Run';
+    const badgeClass = isRun ? 'act-badge-run' : 'act-badge-gym';
+    const z2badge = (a.zone2) ? '<span class="act-badge-z2">Zone 2</span>' : '';
+    const distStr = a.distance ? `<span>📍 ${a.distance}${a.distanceUnit || 'km'}</span>` : '';
+    const paceStr = a.pace ? `<span>⏱ ${a.pace}</span>` : '';
+    const hrStr = a.avgHR ? `<span>❤️ ${a.avgHR} avg</span>` : '';
+    const calStr = a.calories ? `<span>🔥 ${a.calories} kcal</span>` : '';
+    return `<div class="act-row" onclick="openActivity(${i})" role="button" tabindex="0">
+      <div class="act-icon">${a.typeIcon || (isRun ? '🏃' : '🏋️')}</div>
+      <div class="act-main">
+        <div class="act-name">${a.name}</div>
+        <div class="act-meta">
+          <span class="${badgeClass}">${a.type}</span>${z2badge}
+          ${distStr}${paceStr}${hrStr}${calStr}
+        </div>
+      </div>
+      <div class="act-right">
+        <div class="act-dur">${fmtDur(a.durationMin)}</div>
+        <div class="act-date">${a.dateLabel || a.date}</div>
+      </div>
+      <div class="act-chevron">›</div>
+    </div>`;
+  }).join('');
+
+  // keyboard accessibility
+  list.querySelectorAll('.act-row').forEach((el, i) => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openActivity(i); });
+  });
+}
+
+function openActivity(i) {
+  const a = RECENT_ACTIVITIES[i];
+  if (!a) return;
+  const isRun = a.type === 'Run';
+
+  let statsHtml = `
+    <div class="modal-stat"><div class="modal-stat-label">Duration</div><div class="modal-stat-value">${fmtDur(a.durationMin)}</div></div>
+    <div class="modal-stat"><div class="modal-stat-label">Avg HR</div><div class="modal-stat-value">${a.avgHR || '—'}<span class="modal-stat-unit"> bpm</span></div></div>
+    <div class="modal-stat"><div class="modal-stat-label">Max HR</div><div class="modal-stat-value">${a.maxHR || '—'}<span class="modal-stat-unit"> bpm</span></div></div>
+    <div class="modal-stat"><div class="modal-stat-label">Calories</div><div class="modal-stat-value">${a.calories || '—'}<span class="modal-stat-unit"> kcal</span></div></div>`;
+  if (isRun && a.distance) {
+    statsHtml += `<div class="modal-stat"><div class="modal-stat-label">Distance</div><div class="modal-stat-value">${a.distance}<span class="modal-stat-unit"> ${a.distanceUnit||'km'}</span></div></div>`;
+  }
+  if (a.pace) {
+    statsHtml += `<div class="modal-stat"><div class="modal-stat-label">Pace</div><div class="modal-stat-value" style="font-size:14px">${a.pace}</div></div>`;
+  }
+  if (a.zone2) {
+    statsHtml += `<div class="modal-stat" style="border-color:rgba(61,220,132,0.3)"><div class="modal-stat-label">Zone</div><div class="modal-stat-value" style="color:var(--green);font-size:14px">Zone 2 ✓</div></div>`;
+  }
+
+  let setsHtml = '';
+  if (a.sets && a.sets.length > 0) {
+    setsHtml = `<div class="modal-sets-title">Exercises</div>
+    <table class="modal-sets-table">
+      <thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Load</th></tr></thead>
+      <tbody>${a.sets.map(s => `<tr>
+        <td>${s.exercise}</td>
+        <td>${s.sets}</td>
+        <td>${s.reps}</td>
+        <td>${s.weight || '—'}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }
+
+  const notesHtml = a.notes ? `<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:8px">Notes</div><div class="modal-notes">${a.notes}</div>` : '';
+  const z2badge = a.zone2 ? '<span class="act-badge-z2" style="margin-left:8px">Zone 2</span>' : '';
+  const badgeClass = isRun ? 'act-badge-run' : 'act-badge-gym';
+
+  document.getElementById('act-modal-body').innerHTML = `
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">${a.typeIcon || ''} ${a.name}${z2badge}</div>
+        <div class="modal-sub"><span class="${badgeClass}">${a.type}</span> &nbsp;·&nbsp; ${a.dateLabel || a.date}</div>
+      </div>
+      <button class="modal-close" onclick="closeActivity()" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-stats">${statsHtml}</div>
+    ${notesHtml}
+    ${setsHtml}
+  `;
+
+  const overlay = document.getElementById('act-modal');
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeActivity() {
+  document.getElementById('act-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('act-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeActivity();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeActivity(); });
+
+// ── Activity table (quarterly history) ─────────────────────────────────────
 const ACTIVITY = [
   {period:'Mar–May 2024',   runs:11, gym:1,  dom:'Running'},
   {period:'Jun–Aug 2024',   runs:19, gym:5,  dom:'Running'},
