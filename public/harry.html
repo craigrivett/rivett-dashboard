@@ -291,7 +291,7 @@ async function loadData() {
     if (!res.ok) throw new Error('API unavailable');
     const data = await res.json();
     if (data.error || data.stale) throw new Error('No data');
-    renderPage(data);
+    (window.renderPage || renderPage)(data);
   } catch(e) {
     renderEmpty();
   }
@@ -533,12 +533,14 @@ document.getElementById('receipt-modal').addEventListener('click', function(e) {
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeReceiptModal(); });
 
-// Patch renderPage to store expenses for modal
-const _origRenderPage = renderPage;
-function renderPage(data) {
+// Store expenses for modal access whenever renderPage is called
+const _renderPageOrig = renderPage;
+window._renderPagePatched = function(data) {
   ALL_EXPENSES = data.expenses || [];
-  _origRenderPage(data);
-}
+  _renderPageOrig(data);
+};
+// Replace the reference used by loadData
+window.renderPage = window._renderPagePatched;
 
 loadData();
 </script>
