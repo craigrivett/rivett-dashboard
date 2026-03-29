@@ -436,6 +436,25 @@ function historyHtml(crons) {
 const AGENTS = {
   family: [
     {
+      emoji:'🧾', name:'Harry', role:'Family expense management — receipts, invoices, OneDrive filing',
+      link: '/harry.html', notifId: 'harry',
+      cronIds:[],
+      tags:[{l:'WhatsApp',c:'idle'},{l:'ZAR',c:'idle'},{l:'OneDrive',c:'idle'},{l:'View tracker →',c:'accent'}],
+      extra: (data) => {
+        const h = data?.harry || {};
+        const count = h.totalExpenses ?? '—';
+        const lastFiled = h.lastFiled ?? null;
+        const pending = h.pending ?? 0;
+        const pendingCls = pending > 0 ? 'warn' : 'ok';
+        const lastLabel = lastFiled ? `Filed: ${lastFiled}` : 'No receipts yet';
+        return `<div class="agent-status-row">
+          <span class="tag tag-ok">${count} logged</span>
+          ${pending > 0 ? `<span class="tag tag-${pendingCls}">${pending} pending</span>` : ''}
+          <span class="tag tag-idle">${lastLabel}</span>
+        </div>`;
+      }
+    },
+    {
       emoji:'🐠', name:'Dory', role:'Family document filing & expiry tracking',
       link: '/dory.html',
       cronIds:['dory-monthly-filing'],
@@ -602,7 +621,14 @@ async function fetchAndRender() {
     if (angusErr) notifications['angus'] = { level: 'error', msg: '✗ Angus run error' };
 
     // Cards
-    const extraData = { dory: DORY_COUNTS, agents: data.agents, notifications, gregSnap };
+    // Harry stats
+    let harryData = null;
+    try {
+      const hr = await fetch('/api/harry?t=' + Date.now());
+      if (hr.ok) harryData = await hr.json();
+    } catch {}
+
+    const extraData = { dory: DORY_COUNTS, agents: data.agents, notifications, gregSnap, harry: harryData };
     document.getElementById('family-agents').innerHTML = AGENTS.family.map(a => buildCard(a, jobs, extraData)).join('');
     document.getElementById('work-agents').innerHTML = AGENTS.work.map(a => buildCard(a, jobs, extraData)).join('');
 

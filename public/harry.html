@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Harry — Expense Tracker</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <style>
+    [data-theme="dark"] {
+      --bg:#080810;--surface:#0f0f1a;--surface2:#14141f;--surface3:#1a1a28;
+      --border:#1e1e30;--border2:#252538;--accent:#7c6af7;
+      --green:#3ddc84;--amber:#f9a825;--red:#ff5252;--muted:#3a3a55;
+      --text:#dcdcf0;--text2:#7878a0;--text3:#4a4a6a;
+    }
+    [data-theme="light"] {
+      --bg:#f4f4f8;--surface:#fff;--surface2:#f0f0f5;--surface3:#e8e8f0;
+      --border:#dcdce8;--border2:#c8c8d8;--accent:#6654e8;
+      --green:#16a34a;--amber:#d97706;--red:#dc2626;--muted:#9090b0;
+      --text:#1a1a2e;--text2:#606080;--text3:#a0a0b8;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;min-height:100vh;}
+
+    header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+    .h-back{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text2);font-size:13px;transition:color 0.2s;}
+    .h-back:hover{color:var(--accent);}
+    .h-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;}
+    .theme-btn{background:none;border:1px solid var(--border2);border-radius:8px;color:var(--text2);padding:4px 8px;cursor:pointer;font-size:13px;}
+
+    .page{max-width:1000px;margin:0 auto;padding:24px 20px 48px;}
+
+    /* Stats grid */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:28px;}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+    .stat-card.good{border-color:rgba(61,220,132,0.3);}
+    .stat-card.warn{border-color:rgba(249,168,37,0.3);}
+    .stat-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text2);margin-bottom:6px;}
+    .stat-value{font-size:26px;font-weight:700;color:var(--text);line-height:1;}
+    .stat-unit{font-size:13px;font-weight:400;color:var(--text2);}
+    .stat-sub{font-size:11px;color:var(--text3);margin-top:5px;}
+
+    /* Section */
+    .section{margin-bottom:28px;}
+    .section-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+
+    /* Category breakdown */
+    .cat-list{display:flex;flex-direction:column;gap:8px;}
+    .cat-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:14px;}
+    .cat-emoji{font-size:20px;width:28px;text-align:center;flex-shrink:0;}
+    .cat-info{flex:1;}
+    .cat-name{font-size:13px;font-weight:600;}
+    .cat-bar-wrap{margin-top:6px;height:5px;background:var(--border2);border-radius:3px;overflow:hidden;}
+    .cat-bar{height:100%;border-radius:3px;background:var(--accent);}
+    .cat-right{text-align:right;flex-shrink:0;}
+    .cat-amount{font-size:14px;font-weight:700;}
+    .cat-count{font-size:10px;color:var(--text3);margin-top:2px;}
+
+    /* Expense table */
+    .exp-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+    .exp-table{width:100%;border-collapse:collapse;}
+    .exp-table th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);}
+    .exp-table td{padding:10px 14px;font-size:12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+    .exp-table tr:last-child td{border-bottom:none;}
+    .exp-table tr:hover td{background:var(--surface2);}
+    .badge{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;}
+    .badge-household{background:rgba(61,220,132,0.1);color:var(--green);border:1px solid rgba(61,220,132,0.2);}
+    .badge-business{background:rgba(124,106,247,0.1);color:var(--accent);border:1px solid rgba(124,106,247,0.2);}
+    .badge-pending{background:rgba(249,168,37,0.1);color:var(--amber);border:1px solid rgba(249,168,37,0.2);}
+    .filed-yes{color:var(--green);font-size:11px;}
+    .filed-no{color:var(--amber);font-size:11px;}
+    .amount-cell{font-weight:600;font-variant-numeric:tabular-nums;}
+
+    /* Monthly chart */
+    .chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
+    .chart-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:14px;}
+    .month-bars{display:flex;align-items:flex-end;gap:8px;height:120px;}
+    .month-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+    .month-bar{width:100%;border-radius:4px 4px 0 0;background:var(--accent);opacity:0.7;transition:opacity 0.2s;min-height:4px;}
+    .month-bar:hover{opacity:1;}
+    .month-bar.current{background:var(--green);opacity:1;}
+    .month-label{font-size:9px;color:var(--text3);}
+    .month-amount{font-size:9px;color:var(--text2);}
+
+    /* Status banner */
+    .status-banner{font-size:11px;color:var(--text3);margin-bottom:20px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;gap:8px;}
+    .status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+    /* Empty state */
+    .empty-state{text-align:center;padding:40px 20px;color:var(--text3);}
+    .empty-state .emoji{font-size:48px;margin-bottom:12px;}
+    .empty-state p{font-size:13px;line-height:1.6;}
+
+    @media(max-width:600px){
+      .page{padding:14px 12px 32px;}
+      .stats-grid{grid-template-columns:repeat(2,1fr);}
+      .exp-table th:nth-child(5),.exp-table td:nth-child(5),
+      .exp-table th:nth-child(6),.exp-table td:nth-child(6){display:none;}
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="h-back" href="/">← Back</a>
+  <div class="h-title">🧾 Harry — Expense Tracker</div>
+  <button class="theme-btn" id="theme-btn">☀️</button>
+</header>
+
+<div class="page">
+
+  <div class="status-banner" id="status-banner">
+    <div class="status-dot"></div>
+    <span id="status-text">Loading…</span>
+  </div>
+
+  <!-- Summary stats -->
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card good">
+      <div class="stat-label">Total Logged</div>
+      <div class="stat-value" id="stat-total">—</div>
+      <div class="stat-sub">all time expenses</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">This Month</div>
+      <div class="stat-value" id="stat-month">—</div>
+      <div class="stat-sub" id="stat-month-count">— entries</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">This Month (R)</div>
+      <div class="stat-value"><span id="stat-month-amount">—</span><span class="stat-unit"> R</span></div>
+      <div class="stat-sub" id="stat-month-label">—</div>
+    </div>
+    <div class="stat-card" id="stat-pending-card">
+      <div class="stat-label">Pending Review</div>
+      <div class="stat-value" id="stat-pending">0</div>
+      <div class="stat-sub">receipts flagged</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Receipts Filed</div>
+      <div class="stat-value" id="stat-filed">—</div>
+      <div class="stat-sub">saved to OneDrive</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Last Filed</div>
+      <div class="stat-value" id="stat-last" style="font-size:16px">—</div>
+      <div class="stat-sub" id="stat-last-vendor">—</div>
+    </div>
+  </div>
+
+  <!-- Monthly spend chart -->
+  <div class="section">
+    <div class="section-title"><span>📈</span> Monthly Spend</div>
+    <div class="chart-wrap">
+      <div class="chart-title">Total spend per month (ZAR)</div>
+      <div class="month-bars" id="month-bars">
+        <div style="color:var(--text3);font-size:12px;padding:20px">Loading chart…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category breakdown -->
+  <div class="section">
+    <div class="section-title"><span>🗂️</span> By Category</div>
+    <div class="cat-list" id="cat-list">
+      <div style="color:var(--text3);font-size:12px;padding:12px">Loading…</div>
+    </div>
+  </div>
+
+  <!-- Recent expenses table -->
+  <div class="section">
+    <div class="section-title"><span>🧾</span> Recent Expenses</div>
+    <div class="exp-wrap">
+      <table class="exp-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Vendor</th>
+            <th>Amount</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Filed</th>
+          </tr>
+        </thead>
+        <tbody id="exp-tbody">
+          <tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Theme
+let theme = localStorage.getItem('theme') || 'dark';
+document.documentElement.setAttribute('data-theme', theme);
+document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+document.getElementById('theme-btn').addEventListener('click', () => {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('theme', theme);
+});
+
+function fmt(n) {
+  if (n === null || n === undefined) return '—';
+  return 'R' + Number(n).toLocaleString('en-ZA', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+const CAT_EMOJIS = {
+  'Groceries':'🛒','Dining & Takeaways':'🍽️','Fuel':'⛽','Medical':'💊','School & Education':'📚',
+  'Utilities':'💡','Domestic Staff':'🧹','Insurance':'🛡️','Home Maintenance':'🔧','Clothing & Personal':'👕',
+  'Entertainment':'🎬','Travel & Accommodation':'✈️','Vehicle Maintenance':'🚗','Pets':'🐾',
+  'Telecommunications':'📱','Cleaning & Supplies':'🧴','Appliances & Furniture':'🛋️','Security':'🔒',
+  'Office Supplies':'📎','Software & Subscriptions':'💻','Professional Services':'⚖️',
+  'Advertising & Marketing':'📣','Equipment':'🖥️','Travel (Business)':'🧳','Meals & Entertainment (Business)':'🤝',
+  'Bank & Finance Charges':'🏦','Other Business':'💼','Uncategorised':'❓',
+};
+
+async function loadData() {
+  try {
+    const res = await fetch('/api/harry?t=' + Date.now());
+    if (!res.ok) throw new Error('API unavailable');
+    const data = await res.json();
+    if (data.error || data.stale) throw new Error('No data');
+    renderPage(data);
+  } catch(e) {
+    renderEmpty();
+  }
+}
+
+function renderEmpty() {
+  document.getElementById('status-text').textContent = 'No expenses logged yet — send a receipt to the Harry WhatsApp group to get started.';
+  document.getElementById('exp-tbody').innerHTML = `<tr><td colspan="6">
+    <div class="empty-state">
+      <div class="emoji">🧾</div>
+      <p>No expenses logged yet.<br>Send a photo of a receipt or invoice<br>to the <strong>Harry</strong> WhatsApp group.</p>
+    </div>
+  </td></tr>`;
+  document.getElementById('cat-list').innerHTML = '<div class="empty-state"><div class="emoji">🗂️</div><p>Categories will appear here once expenses are logged.</p></div>';
+  document.getElementById('month-bars').innerHTML = '<div style="color:var(--text3);font-size:12px;padding:20px">No data yet</div>';
+}
+
+function renderPage(data) {
+  const expenses = data.expenses || [];
+  const now = new Date();
+  const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+  // Status banner
+  document.getElementById('status-text').innerHTML =
+    `📅 ${data.dataAsOf || 'Live'} · Last updated: <strong>${data.updatedAtLabel || '—'}</strong>`;
+
+  // Stats
+  const monthExp = expenses.filter(e => e.date && e.date.startsWith(thisMonth));
+  const monthTotal = monthExp.reduce((s,e) => s + (Number(e.amount)||0), 0);
+  const pending = expenses.filter(e => e.receiptFiled === 'No' || e.receiptFiled === 'Unclear').length;
+  const filed = expenses.filter(e => e.receiptFiled === 'Yes').length;
+  const last = expenses[0];
+
+  document.getElementById('stat-total').textContent = expenses.length;
+  document.getElementById('stat-month').textContent = monthExp.length;
+  document.getElementById('stat-month-count').textContent = `${monthExp.length} entries`;
+  document.getElementById('stat-month-amount').textContent = monthTotal.toLocaleString('en-ZA', {minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('stat-month-label').textContent = now.toLocaleString('en-ZA',{month:'long',year:'numeric'});
+  document.getElementById('stat-pending').textContent = pending;
+  if (pending > 0) document.getElementById('stat-pending-card').classList.add('warn');
+  document.getElementById('stat-filed').textContent = filed;
+  if (last) {
+    document.getElementById('stat-last').textContent = last.date || '—';
+    document.getElementById('stat-last-vendor').textContent = last.vendor || '—';
+  }
+
+  // Monthly chart
+  const monthMap = {};
+  expenses.forEach(e => {
+    if (!e.date) return;
+    const m = e.date.slice(0,7);
+    monthMap[m] = (monthMap[m]||0) + (Number(e.amount)||0);
+  });
+  const months = Object.keys(monthMap).sort().slice(-6);
+  if (months.length > 0) {
+    const maxVal = Math.max(...months.map(m => monthMap[m]), 1);
+    document.getElementById('month-bars').innerHTML = months.map(m => {
+      const val = monthMap[m];
+      const pct = Math.round(val / maxVal * 100);
+      const isCurrent = m === thisMonth;
+      const label = new Date(m+'-01').toLocaleString('en-ZA',{month:'short'});
+      return `<div class="month-bar-wrap">
+        <div class="month-amount">R${(val/1000).toFixed(1)}k</div>
+        <div class="month-bar${isCurrent?' current':''}" style="height:${Math.max(pct,3)}%"></div>
+        <div class="month-label">${label}</div>
+      </div>`;
+    }).join('');
+  } else {
+    document.getElementById('month-bars').innerHTML = '<div style="color:var(--text3);font-size:12px;padding:20px">No data yet</div>';
+  }
+
+  // Categories
+  const catMap = {};
+  expenses.forEach(e => {
+    const cat = e.category || 'Uncategorised';
+    if (!catMap[cat]) catMap[cat] = {total:0, count:0};
+    catMap[cat].total += Number(e.amount)||0;
+    catMap[cat].count++;
+  });
+  const cats = Object.entries(catMap).sort((a,b) => b[1].total - a[1].total);
+  const maxCat = cats.length ? cats[0][1].total : 1;
+  if (cats.length > 0) {
+    document.getElementById('cat-list').innerHTML = cats.map(([cat, {total, count}]) => {
+      const pct = Math.round(total/maxCat*100);
+      const emoji = CAT_EMOJIS[cat] || '📦';
+      return `<div class="cat-row">
+        <div class="cat-emoji">${emoji}</div>
+        <div class="cat-info">
+          <div class="cat-name">${cat}</div>
+          <div class="cat-bar-wrap"><div class="cat-bar" style="width:${pct}%"></div></div>
+        </div>
+        <div class="cat-right">
+          <div class="cat-amount">${fmt(total)}</div>
+          <div class="cat-count">${count} ${count===1?'entry':'entries'}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    document.getElementById('cat-list').innerHTML = '<div class="empty-state"><div class="emoji">🗂️</div><p>No categories yet.</p></div>';
+  }
+
+  // Expenses table
+  const rows = expenses.slice(0, 50);
+  if (rows.length > 0) {
+    document.getElementById('exp-tbody').innerHTML = rows.map(e => {
+      const catType = (e.category||'').toLowerCase().includes('business') ? 'business' : 'household';
+      const filedCls = e.receiptFiled === 'Yes' ? 'filed-yes' : 'filed-no';
+      const filedIcon = e.receiptFiled === 'Yes' ? '✅' : e.receiptFiled === 'Unclear' ? '⚠️' : '❌';
+      return `<tr>
+        <td>${e.date||'—'}</td>
+        <td>${e.vendor||'—'}</td>
+        <td class="amount-cell">${fmt(e.amount)}</td>
+        <td><span class="badge badge-${catType}">${e.category||'—'}</span></td>
+        <td style="color:var(--text2)">${e.description||'—'}</td>
+        <td class="${filedCls}">${filedIcon} ${e.receiptFiled||'—'}</td>
+      </tr>`;
+    }).join('');
+  } else {
+    renderEmpty();
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>
