@@ -86,6 +86,25 @@
     .status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 
+    /* Invoices */
+    .inv-list{display:flex;flex-direction:column;gap:8px;}
+    .inv-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 16px;display:flex;align-items:center;gap:14px;}
+    .inv-row.overdue{border-color:rgba(255,82,82,0.4);background:rgba(255,82,82,0.04);}
+    .inv-row.due-soon{border-color:rgba(249,168,37,0.4);background:rgba(249,168,37,0.04);}
+    .inv-row.paid{opacity:0.45;}
+    .inv-icon{font-size:22px;width:28px;text-align:center;flex-shrink:0;}
+    .inv-info{flex:1;}
+    .inv-vendor{font-size:13px;font-weight:600;}
+    .inv-desc{font-size:11px;color:var(--text2);margin-top:2px;}
+    .inv-meta{font-size:10px;color:var(--text3);margin-top:4px;}
+    .inv-right{text-align:right;flex-shrink:0;}
+    .inv-amount{font-size:15px;font-weight:700;}
+    .inv-due{font-size:10px;margin-top:3px;}
+    .inv-due.overdue{color:var(--red);}
+    .inv-due.due-soon{color:var(--amber);}
+    .inv-due.ok{color:var(--text3);}
+    .inv-due.paid{color:var(--green);}
+
     /* Empty state */
     .empty-state{text-align:center;padding:40px 20px;color:var(--text3);}
     .empty-state .emoji{font-size:48px;margin-bottom:12px;}
@@ -145,6 +164,14 @@
       <div class="stat-label">Last Filed</div>
       <div class="stat-value" id="stat-last" style="font-size:16px">—</div>
       <div class="stat-sub" id="stat-last-vendor">—</div>
+    </div>
+  </div>
+
+  <!-- Pending invoices -->
+  <div class="section" id="invoices-section">
+    <div class="section-title"><span>📬</span> Invoices to Pay</div>
+    <div class="inv-list" id="inv-list">
+      <div style="color:var(--text3);font-size:12px;padding:12px">Loading…</div>
     </div>
   </div>
 
@@ -230,7 +257,73 @@ async function loadData() {
   }
 }
 
+function renderInvoices(invoices) {
+  const list = document.getElementById('inv-list');
+  const section = document.getElementById('invoices-section');
+  const active = (invoices || []).filter(i => i.status !== 'paid');
+
+  if (!invoices || invoices.length === 0) {
+    list.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:12px 0">No pending invoices — Harry will add them here when they arrive.</div>';
+    return;
+  }
+
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  const sorted = [...invoices].sort((a,b) => {
+    const order = {overdue:0,'due-soon':1,unpaid:2,paid:3};
+    return (order[a.status]??2) - (order[b.status]??2);
+  });
+
+  list.innerHTML = sorted.map(inv => {
+    let statusCls = '';
+    let dueLabel = '';
+    let dueClass = 'ok';
+
+    if (inv.status === 'paid') {
+      statusCls = 'paid';
+      dueLabel = '✅ Paid';
+      dueClass = 'paid';
+    } else if (inv.dueDate) {
+      const due = new Date(inv.dueDate); due.setHours(0,0,0,0);
+      const diff = Math.round((due - today) / 86400000);
+      if (diff < 0) {
+        statusCls = 'overdue'; dueClass = 'overdue';
+        dueLabel = `⚠️ Overdue by ${Math.abs(diff)}d`;
+      } else if (diff <= 3) {
+        statusCls = 'due-soon'; dueClass = 'due-soon';
+        dueLabel = diff === 0 ? '🔴 Due today' : `🟡 Due in ${diff}d`;
+      } else {
+        dueLabel = `Due ${inv.dueDate}`;
+      }
+    } else {
+      dueLabel = 'Due date unknown';
+    }
+
+    const invNum = inv.invoiceNumber ? `· ${inv.invoiceNumber}` : '';
+    return `<div class="inv-row ${statusCls}">
+      <div class="inv-icon">${inv.status === 'paid' ? '✅' : inv.status === 'overdue' ? '🔴' : inv.status === 'due-soon' ? '🟡' : '📄'}</div>
+      <div class="inv-info">
+        <div class="inv-vendor">${inv.vendor}</div>
+        <div class="inv-desc">${inv.description || '—'}</div>
+        <div class="inv-meta">Received ${inv.receivedDate || '—'} ${invNum}</div>
+      </div>
+      <div class="inv-right">
+        <div class="inv-amount">${fmt(inv.amount)}</div>
+        <div class="inv-due ${dueClass}">${dueLabel}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Update section title with badge if there are urgent items
+  const urgent = active.filter(i => i.status === 'overdue' || i.status === 'due-soon').length;
+  if (urgent > 0) {
+    document.querySelector('#invoices-section .section-title').innerHTML =
+      `<span>📬</span> Invoices to Pay <span style="background:rgba(255,82,82,0.15);color:var(--red);border:1px solid rgba(255,82,82,0.3);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:4px">${urgent} urgent</span>`;
+  }
+}
+
 function renderEmpty() {
+  renderInvoices([]);
   document.getElementById('status-text').textContent = 'No expenses logged yet — send a receipt to the Harry WhatsApp group to get started.';
   document.getElementById('exp-tbody').innerHTML = `<tr><td colspan="6">
     <div class="empty-state">
@@ -246,6 +339,9 @@ function renderPage(data) {
   const expenses = data.expenses || [];
   const now = new Date();
   const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+  // Invoices
+  renderInvoices(data.pendingInvoices || []);
 
   // Status banner
   document.getElementById('status-text').innerHTML =
