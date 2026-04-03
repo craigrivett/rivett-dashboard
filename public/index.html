@@ -509,6 +509,17 @@ const AGENTS = {
       cronIds:['Angus — Morning Run','Angus — Afternoon Run'],
       tags:[{l:'GritCargo',c:'idle'},{l:'2× daily',c:'idle'},{l:'View invoices →',c:'accent'}]
     },
+    {
+      emoji:'✍️', name:'Pip', role:'Content partner — blog & LinkedIn ideation, drafts, pipeline',
+      cronIds:[],
+      tags:[{l:'craigrivett.com',c:'idle'},{l:'LinkedIn',c:'idle'},{l:'Weekly cadence',c:'idle'}],
+      extra: (data) => {
+        return `<div class="agent-status-row">
+          <span class="tag tag-idle">3 ideas in pipeline</span>
+          <span class="tag tag-warn">0 published</span>
+        </div>`;
+      }
+    },
   ]
 };
 
