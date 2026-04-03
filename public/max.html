@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Max — Protein Tracker</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+  <link rel="manifest" href="/manifest.json"/>
+  <style>
+    [data-theme="dark"]{--bg:#080810;--surface:#0f0f1a;--surface2:#14141f;--surface3:#1a1a28;--border:#1e1e30;--border2:#252538;--accent:#3ddc84;--green:#3ddc84;--amber:#f9a825;--red:#ff5252;--muted:#3a3a55;--text:#dcdcf0;--text2:#7878a0;--text3:#4a4a6a;}
+    [data-theme="light"]{--bg:#f4f4f8;--surface:#fff;--surface2:#f0f0f5;--surface3:#e8e8f0;--border:#dcdce8;--border2:#c8c8d8;--accent:#16a34a;--green:#16a34a;--amber:#d97706;--red:#dc2626;--muted:#9090b0;--text:#1a1a2e;--text2:#606080;--text3:#a0a0b8;}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;min-height:100vh;}
+    header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+    .h-back{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text2);font-size:13px;}
+    .h-back:hover{color:var(--accent);}
+    .h-title{font-size:15px;font-weight:700;}
+    .h-right{display:flex;align-items:center;gap:10px;}
+    .burn-pill{background:rgba(255,112,67,0.1);border:1px solid rgba(255,112,67,0.25);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;color:#ff7043;}
+    .theme-btn{background:none;border:1px solid var(--border2);border-radius:8px;color:var(--text2);padding:4px 8px;cursor:pointer;font-size:13px;}
+    .page{max-width:860px;margin:0 auto;padding:24px 20px 48px;}
+    .section{margin-bottom:28px;}
+    .section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+
+    /* Today's ring */
+    .today-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;display:flex;align-items:center;gap:28px;margin-bottom:24px;}
+    .ring-wrap{flex-shrink:0;position:relative;width:120px;height:120px;}
+    .ring-wrap canvas{position:absolute;top:0;left:0;}
+    .ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+    .ring-val{font-size:26px;font-weight:700;line-height:1;color:var(--text);}
+    .ring-unit{font-size:11px;color:var(--text2);margin-top:2px;}
+    .today-info{flex:1;}
+    .today-date{font-size:11px;color:var(--text3);margin-bottom:6px;}
+    .today-target{font-size:13px;color:var(--text2);margin-bottom:10px;}
+    .today-target strong{color:var(--text);}
+    .progress-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+    .prog-label{font-size:11px;color:var(--text2);width:60px;flex-shrink:0;}
+    .prog-bar-bg{flex:1;height:8px;background:var(--border2);border-radius:4px;overflow:hidden;}
+    .prog-bar-fill{height:100%;border-radius:4px;transition:width 0.6s ease;}
+    .prog-bar-protein{background:linear-gradient(90deg,#3ddc84,#00bfa5);}
+    .prog-bar-cal{background:linear-gradient(90deg,#f9a825,#ff7043);}
+    .prog-val{font-size:11px;font-weight:600;width:50px;text-align:right;flex-shrink:0;}
+
+    /* Stats grid */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:24px;}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+    .stat-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text2);margin-bottom:6px;}
+    .stat-value{font-size:24px;font-weight:700;line-height:1;}
+    .stat-sub{font-size:10px;color:var(--text3);margin-top:4px;}
+    .stat-value.green{color:var(--green);}
+    .stat-value.amber{color:var(--amber);}
+    .stat-value.red{color:var(--red);}
+
+    /* Food log */
+    .log-table{width:100%;border-collapse:collapse;}
+    .log-table th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);padding:7px 12px;border-bottom:1px solid var(--border);text-align:left;}
+    .log-table td{padding:9px 12px;font-size:12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+    .log-table tr:last-child td{border-bottom:none;}
+    .log-table tr:hover td{background:var(--surface2);}
+    .protein-cell{font-weight:700;color:var(--green);}
+    .cal-cell{color:var(--amber);}
+
+    /* Badge */
+    .badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+    .badge-ok{background:rgba(61,220,132,0.1);color:var(--green);border:1px solid rgba(61,220,132,0.2);}
+    .badge-warn{background:rgba(249,168,37,0.1);color:var(--amber);border:1px solid rgba(249,168,37,0.2);}
+    .badge-idle{background:rgba(58,58,85,0.3);color:var(--text2);border:1px solid var(--border);}
+    .badge-red{background:rgba(255,82,82,0.1);color:var(--red);border:1px solid rgba(255,82,82,0.2);}
+    [data-theme="light"] .badge-idle{background:rgba(180,180,210,0.2);}
+
+    /* Weekly chart */
+    .week-bars{display:flex;align-items:flex-end;gap:8px;height:100px;}
+    .week-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+    .week-bar-bg{width:100%;background:var(--border2);border-radius:4px 4px 0 0;overflow:hidden;position:relative;}
+    .week-bar-fill{width:100%;border-radius:4px 4px 0 0;transition:height 0.5s ease;}
+    .week-bar-target{position:absolute;left:0;right:0;height:2px;background:rgba(61,220,132,0.5);}
+    .week-day{font-size:10px;color:var(--text3);}
+    .week-val{font-size:9px;color:var(--text2);}
+
+    /* How to log */
+    .how-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;font-size:12px;color:var(--text2);line-height:1.8;}
+    .how-card strong{color:var(--text);}
+    .how-example{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-top:10px;font-size:12px;color:var(--text2);font-style:italic;}
+
+    /* Reference table */
+    .ref-table{width:100%;border-collapse:collapse;}
+    .ref-table th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);padding:6px 10px;border-bottom:1px solid var(--border);text-align:left;}
+    .ref-table td{padding:7px 10px;font-size:12px;border-bottom:1px solid var(--border);}
+    .ref-table tr:last-child td{border-bottom:none;}
+    .ref-table tr:hover td{background:var(--surface2);}
+
+    @media(max-width:600px){
+      header{padding:0 14px;}
+      .page{padding:14px 12px 32px;}
+      .today-card{flex-direction:column;align-items:flex-start;gap:16px;}
+      .stats-grid{grid-template-columns:repeat(2,1fr);}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <a class="h-back" href="/">← Back</a>
+  <div class="h-title">🥩 Max — Protein Tracker</div>
+  <div class="h-right">
+    <div class="burn-pill" id="burn-pill">🔥 — days to Burn</div>
+    <button class="theme-btn" id="theme-btn">☀️</button>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- Today's progress ring -->
+  <div class="today-card" id="today-card">
+    <div class="ring-wrap">
+      <canvas id="ring-canvas" width="120" height="120"></canvas>
+      <div class="ring-center">
+        <div class="ring-val" id="ring-val">0</div>
+        <div class="ring-unit">/ 185g</div>
+      </div>
+    </div>
+    <div class="today-info">
+      <div class="today-date" id="today-date">Loading…</div>
+      <div class="today-target">Target: <strong>170–200g protein</strong> · calories secondary</div>
+      <div class="progress-row">
+        <div class="prog-label">Protein</div>
+        <div class="prog-bar-bg"><div class="prog-bar-fill prog-bar-protein" id="prog-protein" style="width:0%"></div></div>
+        <div class="prog-val" id="prog-protein-val" style="color:var(--green)">0g</div>
+      </div>
+      <div class="progress-row">
+        <div class="prog-label">Calories</div>
+        <div class="prog-bar-bg"><div class="prog-bar-fill prog-bar-cal" id="prog-cal" style="width:0%"></div></div>
+        <div class="prog-val" id="prog-cal-val" style="color:var(--amber)">0</div>
+      </div>
+      <div id="today-status" style="margin-top:10px;font-size:12px;color:var(--text3)">No food logged yet today.</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Today Protein</div>
+      <div class="stat-value green" id="stat-protein">0g</div>
+      <div class="stat-sub">of 185g target</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Today Calories</div>
+      <div class="stat-value amber" id="stat-cal">0</div>
+      <div class="stat-sub">kcal logged</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Still needed</div>
+      <div class="stat-value" id="stat-gap" style="color:var(--text2)">185g</div>
+      <div class="stat-sub">to hit target</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Days to Burn</div>
+      <div class="stat-value" id="stat-burn" style="color:#ff7043">—</div>
+      <div class="stat-sub">April 27 2026</div>
+    </div>
+  </div>
+
+  <!-- Today's food log -->
+  <div class="section">
+    <div class="section-title"><span>🍽️</span> Today's Log</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <table class="log-table">
+        <thead><tr><th>Time</th><th>Food</th><th>Protein</th><th>Cals</th></tr></thead>
+        <tbody id="log-tbody">
+          <tr><td colspan="4" style="text-align:center;padding:20px;font-size:12px;color:var(--text3)">No entries yet today — send Max a food note via WhatsApp.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Weekly chart -->
+  <div class="section">
+    <div class="section-title"><span>📊</span> This Week</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:12px;">Daily protein (g) · dashed line = 185g target</div>
+      <div class="week-bars" id="week-bars">
+        <div style="color:var(--text3);font-size:12px">No data yet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How to log -->
+  <div class="section">
+    <div class="section-title"><span>💬</span> How to Log</div>
+    <div class="how-card">
+      Send Max a quick WhatsApp message with what you've eaten — rough descriptions are fine. He'll calculate the protein and calories and update your daily total.
+      <div class="how-example">
+        "protein shake, 3 eggs, chicken breast and rice for lunch"<br>
+        "steak about 200g, handful of almonds"<br>
+        "had a tuna tin"
+      </div>
+      <div style="margin-top:12px">Max replies with a breakdown + running total. 6pm summary lands automatically. Nudge at 2pm if you're behind.</div>
+    </div>
+  </div>
+
+  <!-- Protein reference -->
+  <div class="section">
+    <div class="section-title"><span>📋</span> Protein Reference</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <table class="ref-table">
+        <thead><tr><th>Food</th><th>Serving</th><th>Protein</th><th>Calories</th></tr></thead>
+        <tbody>
+          <tr><td>Chicken breast</td><td>100g</td><td class="protein-cell">31g</td><td class="cal-cell">165</td></tr>
+          <tr><td>Steak / beef</td><td>100g</td><td class="protein-cell">27g</td><td class="cal-cell">217</td></tr>
+          <tr><td>Salmon</td><td>100g</td><td class="protein-cell">25g</td><td class="cal-cell">208</td></tr>
+          <tr><td>Tuna (tin, drained)</td><td>85g</td><td class="protein-cell">20g</td><td class="cal-cell">100</td></tr>
+          <tr><td>Eggs (large)</td><td>1 egg</td><td class="protein-cell">6g</td><td class="cal-cell">70</td></tr>
+          <tr><td>Whey protein shake</td><td>1 scoop (30g)</td><td class="protein-cell">24g</td><td class="cal-cell">120</td></tr>
+          <tr><td>Greek yoghurt</td><td>200g</td><td class="protein-cell">17g</td><td class="cal-cell">130</td></tr>
+          <tr><td>Cottage cheese</td><td>100g</td><td class="protein-cell">11g</td><td class="cal-cell">98</td></tr>
+          <tr><td>Beef mince</td><td>100g</td><td class="protein-cell">26g</td><td class="cal-cell">250</td></tr>
+          <tr><td>Pork chop</td><td>100g</td><td class="protein-cell">27g</td><td class="cal-cell">231</td></tr>
+          <tr><td>Milk</td><td>250ml</td><td class="protein-cell">8g</td><td class="cal-cell">150</td></tr>
+          <tr><td>Protein bar (avg)</td><td>1 bar</td><td class="protein-cell">20g</td><td class="cal-cell">200</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Theme
+let theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+document.documentElement.setAttribute('data-theme', theme);
+document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+document.getElementById('theme-btn').addEventListener('click', () => {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('theme', theme);
+  drawRing(currentProtein, 185);
+});
+
+// AfrikaBurn countdown
+const BURN_DATE = new Date('2026-04-27T00:00:00+02:00');
+const daysLeft = Math.max(0, Math.ceil((BURN_DATE - Date.now()) / 86400000));
+document.getElementById('burn-pill').textContent = `🔥 ${daysLeft} days to Burn`;
+document.getElementById('stat-burn').textContent = daysLeft;
+
+// Today's date
+const now = new Date();
+const sast = new Date(now.getTime() + 2 * 3600000);
+const todayStr = sast.toISOString().slice(0,10);
+document.getElementById('today-date').textContent = sast.toLocaleDateString('en-ZA', {weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:'Africa/Johannesburg'});
+
+// Ring chart
+let currentProtein = 0;
+function drawRing(val, target) {
+  const canvas = document.getElementById('ring-canvas');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = 120 * dpr; canvas.height = 120 * dpr;
+  canvas.style.width = '120px'; canvas.style.height = '120px';
+  ctx.scale(dpr, dpr);
+  const cx = 60, cy = 60, r = 50, lw = 10;
+  const pct = Math.min(val / target, 1);
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  // Background ring
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.strokeStyle = isDark ? '#1a1a28' : '#e8e8f0'; ctx.lineWidth = lw; ctx.stroke();
+  // Progress ring
+  if (pct > 0) {
+    const grad = ctx.createLinearGradient(cx - r, cy, cx + r, cy);
+    grad.addColorStop(0, '#3ddc84'); grad.addColorStop(1, '#00bfa5');
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * pct);
+    ctx.strokeStyle = grad; ctx.lineWidth = lw;
+    ctx.lineCap = 'round'; ctx.stroke();
+  }
+  document.getElementById('ring-val').textContent = val;
+}
+drawRing(0, 185);
+
+// Load data from shim (via /api/data which proxies the gateway)
+async function loadData() {
+  try {
+    const res = await fetch('/api/data?t=' + Date.now());
+    const data = await res.json();
+    const nutrition = data?.nutrition;
+    if (!nutrition || nutrition.date !== todayStr) return;
+
+    const p = nutrition.protein_g || 0;
+    const c = nutrition.calories || 0;
+    currentProtein = p;
+
+    drawRing(p, 185);
+    document.getElementById('ring-val').textContent = p;
+    document.getElementById('stat-protein').textContent = p + 'g';
+    document.getElementById('stat-cal').textContent = c;
+    document.getElementById('stat-gap').textContent = Math.max(0, 185 - p) + 'g';
+    document.getElementById('prog-protein').style.width = Math.min(p / 185 * 100, 100) + '%';
+    document.getElementById('prog-protein-val').textContent = p + 'g';
+    document.getElementById('prog-cal').style.width = Math.min(c / 2500 * 100, 100) + '%';
+    document.getElementById('prog-cal-val').textContent = c;
+
+    const pct = Math.round(p / 185 * 100);
+    let statusMsg = '';
+    if (p === 0) statusMsg = 'No food logged yet today.';
+    else if (p < 100) statusMsg = `${pct}% of target — keep going 💪`;
+    else if (p < 170) statusMsg = `${p}g logged — almost there, ${185 - p}g to go.`;
+    else statusMsg = `✅ Target hit! ${p}g protein today.`;
+    document.getElementById('today-status').textContent = statusMsg;
+
+    // Log table
+    if (nutrition.entries && nutrition.entries.length > 0) {
+      document.getElementById('log-tbody').innerHTML = nutrition.entries.map(e =>
+        `<tr>
+          <td style="color:var(--text3)">${e.time || '—'}</td>
+          <td>${e.description}</td>
+          <td class="protein-cell">~${e.protein_g}g</td>
+          <td class="cal-cell">${e.calories || '—'}</td>
+        </tr>`
+      ).join('') + `<tr style="background:var(--surface2)">
+        <td colspan="2" style="font-weight:600;padding:9px 12px">Total</td>
+        <td class="protein-cell" style="font-weight:700">${p}g</td>
+        <td class="cal-cell" style="font-weight:700">${c}</td>
+      </tr>`;
+    }
+  } catch(e) {}
+
+  // Weekly bars from history in nutrition data
+  try {
+    const res = await fetch('/api/data?t=' + Date.now());
+    const data = await res.json();
+    const weekData = data?.nutritionWeek;
+    if (weekData && weekData.length > 0) renderWeekBars(weekData);
+  } catch(e) {}
+}
+
+function renderWeekBars(days) {
+  const maxVal = Math.max(...days.map(d => d.protein_g || 0), 185);
+  const barsHtml = days.map(d => {
+    const pct = Math.round((d.protein_g || 0) / maxVal * 100);
+    const targetPct = Math.round(185 / maxVal * 100);
+    const met = (d.protein_g || 0) >= 170;
+    const color = met ? 'var(--green)' : (d.protein_g || 0) > 100 ? 'var(--amber)' : 'var(--muted)';
+    return `<div class="week-bar-wrap">
+      <div class="week-val">${d.protein_g || 0}g</div>
+      <div class="week-bar-bg" style="height:80px">
+        <div class="week-bar-fill" style="height:${pct}%;background:${color};margin-top:auto"></div>
+        <div class="week-bar-target" style="bottom:${targetPct}%"></div>
+      </div>
+      <div class="week-day">${d.day || ''}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('week-bars').innerHTML = barsHtml;
+}
+
+loadData();
+setInterval(loadData, 60000);
+</script>
+</body>
+</html>

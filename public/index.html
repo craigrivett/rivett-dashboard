@@ -17,7 +17,7 @@
       --border: #1e1e30; --border2: #252538; --accent: #7c6af7;
       --green: #3ddc84; --amber: #f9a825; --red: #ff5252; --muted: #3a3a55;
       --text: #dcdcf0; --text2: #7878a0; --text3: #4a4a6a;
-      --family: #f472b6; --work: #60a5fa; --burn: #ff7043;
+      --family: #f472b6; --work: #60a5fa; --burn: #ff7043; --personal: #3ddc84;
       --card-hover: #1a1a28;
     }
     [data-theme="light"] {
@@ -25,7 +25,7 @@
       --border: #dcdce8; --border2: #c8c8d8; --accent: #6654e8;
       --green: #16a34a; --amber: #d97706; --red: #dc2626; --muted: #9090b0;
       --text: #1a1a2e; --text2: #5050708; --text3: #a0a0b8;
-      --family: #db2777; --work: #2563eb; --burn: #ea580c;
+      --family: #db2777; --work: #2563eb; --burn: #ea580c; --personal: #16a34a;
       --card-hover: #eaeaf2;
       --text2: #606080;
     }
@@ -139,12 +139,13 @@
     .history-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 
     .connector { display: flex; justify-content: center; color: var(--muted); font-size: 14px; line-height: 0.6; margin: 2px 0; }
-    .divisions { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; overflow: hidden; }
+    .divisions { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; overflow: hidden; }
     .division { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
     .div-header { padding: 10px 14px 8px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
     .div-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
     .div-title.family { color: var(--family); }
     .div-title.work   { color: var(--work); }
+    .div-title.personal { color: var(--personal); }
     .div-agents { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
 
     /* Dory stats */
@@ -221,7 +222,7 @@
       .agent-card.ceo .agent-emoji { font-size: 26px; }
       .agent-card.ceo .agent-name { font-size: 15px; }
       .connector { display: none; }
-      .divisions { display: flex !important; flex-direction: column; gap: 12px; overflow: visible; height: auto; }
+      .divisions { display: flex !important; flex-direction: column !important; gap: 12px; overflow: visible; height: auto; }
       .division { overflow: visible; height: auto; }
       .div-agents { overflow: visible; height: auto; padding: 10px; gap: 8px; }
       aside { flex: none; border-left: none; border-top: 1px solid var(--border); overflow: visible; height: auto; }
@@ -284,6 +285,10 @@
     <div class="division">
       <div class="div-header"><span>💼</span><span class="div-title work">Work</span></div>
       <div class="div-agents" id="work-agents"><div class="loading">Loading…</div></div>
+    </div>
+    <div class="division">
+      <div class="div-header"><span>🌿</span><span class="div-title personal">Personal</span></div>
+      <div class="div-agents" id="personal-agents"><div class="loading">Loading…</div></div>
     </div>
   </div>
 </main>
@@ -502,6 +507,25 @@ const AGENTS = {
       }
     },
   ],
+  personal: [
+    {
+      emoji:'🥩', name:'Max', role:'Protein tracker — daily intake, AfrikaBurn prep',
+      link: '/max.html',
+      cronIds:[],
+      tags:[{l:'170–200g target',c:'idle'},{l:'6pm summary',c:'idle'},{l:'View tracker →',c:'accent'}],
+      extra: (data) => {
+        const n = data?.nutrition;
+        const p = n?.protein_g ?? 0;
+        const pct = Math.round(p / 185 * 100);
+        const cls = p >= 170 ? 'ok' : p >= 100 ? 'warn' : 'idle';
+        const days = Math.max(0, Math.ceil((new Date('2026-04-27T00:00:00+02:00') - Date.now()) / 86400000));
+        return `<div class="agent-status-row">
+          <span class="tag tag-${cls}">${p}g protein today (${pct}%)</span>
+          <span class="tag tag-idle">${days}d to Burn</span>
+        </div>`;
+      }
+    },
+  ],
   work: [
     {
       emoji:'🤖', name:'Angus', role:'GritCargo accounts clerk — invoice filing & Sheets',
@@ -643,6 +667,7 @@ async function fetchAndRender() {
     const extraData = { dory: DORY_COUNTS, agents: data.agents, notifications, gregSnap, harry: harryData };
     document.getElementById('family-agents').innerHTML = AGENTS.family.map(a => buildCard(a, jobs, extraData)).join('');
     document.getElementById('work-agents').innerHTML = AGENTS.work.map(a => buildCard(a, jobs, extraData)).join('');
+    document.getElementById('personal-agents').innerHTML = AGENTS.personal.map(a => buildCard(a, jobs, extraData)).join('');
 
     // Sidebar
     document.getElementById('cron-list').innerHTML = buildSidebar(jobs) || '<div class="loading">No data</div>';
