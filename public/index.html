@@ -514,7 +514,7 @@ const AGENTS = {
       cronIds:[],
       tags:[{l:'170–200g target',c:'idle'},{l:'6pm summary',c:'idle'},{l:'View tracker →',c:'accent'}],
       extra: (data) => {
-        const n = data?.nutrition;
+        const n = data?.gregSnap?.nutrition || data?.nutrition;
         const p = n?.protein_g ?? 0;
         const pct = Math.round(p / 185 * 100);
         const cls = p >= 170 ? 'ok' : p >= 100 ? 'warn' : 'idle';
