@@ -165,7 +165,8 @@
 <body>
 
 <header>
-  <h1>🏋️ Hyrox Split Calculator</h1>
+  <img src="/hyrox-logo.svg" alt="Hyrox Logo" style="width:80px;height:80px;margin-bottom:8px;display:block;margin-left:auto;margin-right:auto;">
+  <h1>Hyrox Split Calculator</h1>
   <div class="sub">Live split tracker & finish time estimator</div>
 </header>
 
@@ -230,7 +231,7 @@ const SEGMENTS = [
   { id:'r1', type:'run',     label:'Run 1',          detail:'1 km',         emoji:'🏃' },
   { id:'s1', type:'station', label:'SkiErg',          detail:'1,000 m',      emoji:'⛷️' },
   { id:'r2', type:'run',     label:'Run 2',          detail:'1 km',         emoji:'🏃' },
-  { id:'s2', type:'station', label:'Sled Push',       detail:'50 m',         emoji:'🛷' },
+  { id:'s2', type:'station', label:'Sled Push',       detail:'50 m · 102 kg (open)', emoji:'🛷' },
   { id:'r3', type:'run',     label:'Run 3',          detail:'1 km',         emoji:'🏃' },
   { id:'s3', type:'station', label:'Sled Pull',       detail:'50 m',         emoji:'🧲' },
   { id:'r4', type:'run',     label:'Run 4',          detail:'1 km',         emoji:'🏃' },
@@ -238,11 +239,11 @@ const SEGMENTS = [
   { id:'r5', type:'run',     label:'Run 5',          detail:'1 km',         emoji:'🏃' },
   { id:'s5', type:'station', label:'Rowing',          detail:'1,000 m',      emoji:'🚣' },
   { id:'r6', type:'run',     label:'Run 6',          detail:'1 km',         emoji:'🏃' },
-  { id:'s6', type:'station', label:'Farmers Carry',   detail:'200 m',        emoji:'🏋️' },
+  { id:'s6', type:'station', label:'Farmers Carry',   detail:'200 m · 2×16 kg (open)', emoji:'🏋️' },
   { id:'r7', type:'run',     label:'Run 7',          detail:'1 km',         emoji:'🏃' },
-  { id:'s7', type:'station', label:'Sandbag Lunges',  detail:'100 m',        emoji:'🎒' },
+  { id:'s7', type:'station', label:'Sandbag Lunges',  detail:'100 m · 10 kg (open)',  emoji:'🎒' },
   { id:'r8', type:'run',     label:'Run 8',          detail:'1 km',         emoji:'🏃' },
-  { id:'s8', type:'station', label:'Wall Balls',      detail:'100 reps',     emoji:'🏀' },
+  { id:'s8', type:'station', label:'Wall Balls',      detail:'100 reps · 4 kg (open)', emoji:'🏀' },
 ];
 
 // Women's typical split suggestions (mm:ss)
@@ -264,6 +265,9 @@ function loadState() {
     const saved = localStorage.getItem('hyrox_state');
     if (saved) state = JSON.parse(saved);
   } catch(e) {}
+  // Guard against missing/corrupt racer keys
+  if (!state.rebecca || typeof state.rebecca !== 'object') state.rebecca = {};
+  if (!state.dani    || typeof state.dani    !== 'object') state.dani    = {};
 }
 
 function saveState() {
@@ -343,7 +347,6 @@ function render() {
               id="inp-${seg.id}"
               placeholder="${seg.type === 'run' ? '6:00' : '5:30'}"
               value="${secs != null ? formatTime(secs) : ''}"
-              inputmode="numeric"
               onkeydown="if(event.key==='Enter') setSplit('${seg.id}')"
             />
             <div class="input-hint">Type mm:ss e.g. 5:42</div>
@@ -377,7 +380,6 @@ function render() {
   if (totalDone > 0) {
     proj.style.display = 'block';
 
-    const remaining = 16 - totalDone;
     let estFinish = totalElapsed;
 
     // Estimate remaining using averages
