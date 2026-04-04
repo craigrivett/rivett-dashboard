@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hyrox Split Calculator 🏋️</title>
+  <title>Hyrox – Rebecca & Dani 💜🧡</title>
   <style>
     :root {
       --bg: #0f0f13;
@@ -13,6 +13,7 @@
       --green: #4caf82;
       --red: #e05a5a;
       --blue: #5b9cf6;
+      --purple: #c084fc;
       --text1: #f0f0f5;
       --text2: #9090aa;
       --text3: #5a5a78;
@@ -26,158 +27,136 @@
       color: var(--text1);
       min-height: 100vh;
       padding: 16px;
+      max-width: 520px;
+      margin: 0 auto;
     }
 
-    header {
-      text-align: center;
-      padding: 20px 0 24px;
+    header { text-align: center; padding: 20px 0 20px; }
+    header img { width: 72px; height: 72px; display: block; margin: 0 auto 10px; }
+    header h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+    header .team-name { 
+      font-size: 15px; font-weight: 600; margin-top: 4px;
+      background: linear-gradient(90deg, #c084fc, #f9a8d4);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
-    header h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
-    header .sub { color: var(--text2); font-size: 13px; margin-top: 4px; }
-    .racer-tabs {
-      display: flex; gap: 8px; margin-bottom: 20px; justify-content: center;
-    }
-    .racer-tab {
-      padding: 8px 20px; border-radius: 20px; border: 1.5px solid var(--border);
-      background: var(--card); color: var(--text2); font-size: 14px; font-weight: 600;
-      cursor: pointer; transition: all 0.15s;
-    }
-    .racer-tab.active {
-      border-color: var(--accent); color: var(--accent); background: #2a2010;
-    }
+    header .sub { color: var(--text2); font-size: 12px; margin-top: 4px; }
 
     /* Summary bar */
     .summary-bar {
       background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-      padding: 16px 20px; margin-bottom: 20px;
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+      padding: 14px 16px; margin-bottom: 16px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
     }
     .sum-item { text-align: center; }
-    .sum-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-    .sum-value { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
-    .sum-value.accent { color: var(--accent); }
-    .sum-value.green { color: var(--green); }
+    .sum-label { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+    .sum-value { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
     .sum-value.blue { color: var(--blue); }
+    .sum-value.green { color: var(--green); }
+    .sum-value.accent { color: var(--accent); }
 
-    /* Progress bar */
-    .progress-wrap { margin-bottom: 20px; }
+    /* Progress */
+    .progress-wrap { margin-bottom: 16px; }
     .progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-    .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.3s; }
-    .progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); margin-top: 5px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--purple), var(--accent)); border-radius: 3px; transition: width 0.3s; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); margin-top: 4px; }
 
-    /* Split list */
-    .splits { display: flex; flex-direction: column; gap: 8px; }
-    .split-item {
-      border-radius: 12px; border: 1px solid var(--border);
-      overflow: hidden;
-    }
+    /* Splits */
+    .splits { display: flex; flex-direction: column; gap: 6px; }
+    .split-item { border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
     .split-header {
       display: flex; align-items: center; gap: 10px;
-      padding: 11px 14px;
-      cursor: pointer;
+      padding: 11px 14px; cursor: pointer; user-select: none;
     }
     .split-header.run { background: var(--run-bg); }
     .split-header.station { background: var(--station-bg); }
     .split-num {
-      width: 24px; height: 24px; border-radius: 50%;
+      width: 22px; height: 22px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 700; flex-shrink: 0;
+      font-size: 10px; font-weight: 700; flex-shrink: 0;
     }
     .split-num.run { background: #1e3055; color: var(--blue); }
-    .split-num.station { background: #2a1e45; color: #a78bfa; }
-    .split-label { flex: 1; }
+    .split-num.station { background: #2a1e45; color: var(--purple); }
+    .split-label { flex: 1; min-width: 0; }
     .split-name { font-size: 14px; font-weight: 600; }
-    .split-detail { font-size: 11px; color: var(--text2); margin-top: 1px; }
+    .split-detail { font-size: 10px; color: var(--text2); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .split-time-display {
-      font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums;
-      min-width: 60px; text-align: right; color: var(--text1);
+      font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums;
+      min-width: 52px; text-align: right; flex-shrink: 0;
     }
     .split-time-display.done { color: var(--green); }
     .split-time-display.empty { color: var(--text3); }
-    .split-chevron { color: var(--text3); font-size: 12px; margin-left: 4px; transition: transform 0.2s; }
+    .split-chevron { color: var(--text3); font-size: 11px; margin-left: 4px; transition: transform 0.2s; flex-shrink: 0; }
     .split-chevron.open { transform: rotate(180deg); }
 
     /* Input panel */
-    .split-input-panel {
-      display: none; padding: 12px 14px 14px;
-      border-top: 1px solid var(--border);
-      background: #13131a;
-    }
+    .split-input-panel { display: none; padding: 12px 14px 14px; border-top: 1px solid var(--border); background: #13131a; }
     .split-input-panel.open { display: block; }
-    .input-row { display: flex; gap: 8px; align-items: center; }
-    .input-group { flex: 1; }
-    .input-group label { font-size: 11px; color: var(--text2); display: block; margin-bottom: 4px; }
+    .input-group label { font-size: 11px; color: var(--text2); display: block; margin-bottom: 5px; }
     .time-input {
-      width: 100%; padding: 10px 12px; background: var(--card);
+      width: 100%; padding: 11px 12px; background: var(--card);
       border: 1.5px solid var(--border); border-radius: 8px;
-      color: var(--text1); font-size: 16px; font-weight: 600;
+      color: var(--text1); font-size: 20px; font-weight: 700;
       font-variant-numeric: tabular-nums; text-align: center;
-      outline: none; transition: border-color 0.15s;
+      outline: none; transition: border-color 0.15s; letter-spacing: 2px;
     }
     .time-input:focus { border-color: var(--accent); }
-    .time-input::placeholder { color: var(--text3); }
+    .time-input::placeholder { color: var(--text3); font-size: 16px; letter-spacing: 1px; }
+    .input-hint { font-size: 11px; color: var(--text3); margin-top: 5px; }
+    .pace-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 12px; }
+    .pace-chip {
+      font-size: 12px; padding: 5px 10px; border-radius: 10px;
+      background: #1f1f2e; border: 1px solid var(--border); color: var(--text2);
+      cursor: pointer; font-weight: 600;
+    }
+    .pace-chip:active, .pace-chip:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-row { display: flex; gap: 8px; }
     .btn-set {
-      padding: 10px 16px; background: var(--accent); color: #000;
-      border: none; border-radius: 8px; font-weight: 700; font-size: 14px;
-      cursor: pointer; margin-top: 20px; white-space: nowrap;
+      flex: 1; padding: 11px 16px; background: var(--accent); color: #000;
+      border: none; border-radius: 8px; font-weight: 700; font-size: 15px;
+      cursor: pointer;
     }
+    .btn-set:active { opacity: 0.85; }
     .btn-clear {
-      padding: 10px 12px; background: transparent; color: var(--text3);
+      padding: 11px 14px; background: transparent; color: var(--text3);
       border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px;
-      cursor: pointer; margin-top: 20px;
+      cursor: pointer;
     }
-    .input-hint { font-size: 11px; color: var(--text3); margin-top: 6px; }
 
-    /* Projection section */
+    /* Projection */
     .projection {
       background: var(--card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 16px 20px; margin-top: 20px;
+      border-radius: 14px; padding: 16px 20px; margin-top: 16px;
     }
-    .proj-title { font-size: 12px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
-    .proj-finish {
-      font-size: 36px; font-weight: 800; color: var(--accent);
-      font-variant-numeric: tabular-nums; text-align: center;
-      margin: 8px 0;
-    }
-    .proj-breakdown { display: flex; justify-content: space-around; margin-top: 12px; }
+    .proj-title { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+    .proj-finish { font-size: 40px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; text-align: center; }
+    .proj-note { font-size: 11px; color: var(--text3); text-align: center; margin-top: 4px; }
+    .proj-breakdown { display: flex; justify-content: space-around; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
     .proj-sub { text-align: center; }
-    .proj-sub-val { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .proj-sub-val { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
     .proj-sub-label { font-size: 10px; color: var(--text2); margin-top: 2px; }
 
-    /* Reset button */
+    /* Reset */
     .btn-reset {
-      display: block; width: 100%; margin-top: 20px;
+      display: block; width: 100%; margin-top: 16px;
       padding: 12px; background: transparent; color: var(--text3);
       border: 1px solid var(--border); border-radius: 10px;
       font-size: 13px; cursor: pointer; text-align: center;
     }
-
-    /* Pace estimates */
-    .pace-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-    .pace-chip {
-      font-size: 11px; padding: 3px 8px; border-radius: 10px;
-      background: #1f1f2e; border: 1px solid var(--border); color: var(--text2);
-      cursor: pointer;
-    }
-    .pace-chip:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-reset:active { background: #1a1a22; }
   </style>
 </head>
 <body>
 
 <header>
-  <img src="/hyrox-logo.svg" alt="Hyrox Logo" style="width:80px;height:80px;margin-bottom:8px;display:block;margin-left:auto;margin-right:auto;">
-  <h1>Hyrox Split Calculator</h1>
-  <div class="sub">Live split tracker & finish time estimator</div>
+  <img src="/hyrox-logo.svg" alt="Hyrox">
+  <h1>Hyrox Split Tracker</h1>
+  <div class="team-name">💜 Rebecca &amp; Dani 🧡 — Women's Doubles</div>
+  <div class="sub">Enter each split as it happens · finish time updates live</div>
 </header>
-
-<div class="racer-tabs">
-  <button class="racer-tab active" onclick="switchRacer('rebecca')">💜 Rebecca</button>
-  <button class="racer-tab" onclick="switchRacer('dani')">🧡 Dani</button>
-</div>
 
 <div class="summary-bar">
   <div class="sum-item">
-    <div class="sum-label">Elapsed</div>
+    <div class="sum-label">Time So Far</div>
     <div class="sum-value blue" id="sum-elapsed">0:00</div>
   </div>
   <div class="sum-item">
@@ -204,92 +183,92 @@
 <div class="splits" id="splits-list"></div>
 
 <div class="projection" id="projection" style="display:none">
-  <div class="proj-title">📊 Estimated Finish</div>
+  <div class="proj-title">📊 Projected Finish Time</div>
   <div class="proj-finish" id="proj-finish">—</div>
+  <div class="proj-note" id="proj-note"></div>
   <div class="proj-breakdown">
     <div class="proj-sub">
       <div class="proj-sub-val" id="proj-run-total">—</div>
-      <div class="proj-sub-label">Total Run Time</div>
+      <div class="proj-sub-label">Running</div>
     </div>
     <div class="proj-sub">
       <div class="proj-sub-val" id="proj-station-total">—</div>
-      <div class="proj-sub-label">Total Station Time</div>
+      <div class="proj-sub-label">Stations</div>
     </div>
     <div class="proj-sub">
       <div class="proj-sub-val" id="proj-avg-km">—</div>
-      <div class="proj-sub-label">Avg Run Pace/km</div>
+      <div class="proj-sub-label">Avg /km</div>
     </div>
   </div>
 </div>
 
-<button class="btn-reset" onclick="resetRacer()">🔄 Reset splits for this racer</button>
+<button class="btn-reset" onclick="resetAll()">🔄 Reset all splits</button>
 
 <script>
-// ─── Hyrox structure ───────────────────────────────────────────────────────
-// Format: 8× (1km run + station). 16 splits total.
+// ── Hyrox Women's Doubles race structure ────────────────────────────────────
+// 8 × (1 km run + 1 workout station) = 16 splits total
+// Partners run together; alternate reps at each station
 const SEGMENTS = [
-  { id:'r1', type:'run',     label:'Run 1',          detail:'1 km',         emoji:'🏃' },
-  { id:'s1', type:'station', label:'SkiErg',          detail:'1,000 m',      emoji:'⛷️' },
-  { id:'r2', type:'run',     label:'Run 2',          detail:'1 km',         emoji:'🏃' },
-  { id:'s2', type:'station', label:'Sled Push',       detail:'50 m · 102 kg (open)', emoji:'🛷' },
-  { id:'r3', type:'run',     label:'Run 3',          detail:'1 km',         emoji:'🏃' },
-  { id:'s3', type:'station', label:'Sled Pull',       detail:'50 m',         emoji:'🧲' },
-  { id:'r4', type:'run',     label:'Run 4',          detail:'1 km',         emoji:'🏃' },
-  { id:'s4', type:'station', label:'Burpee Broad Jumps', detail:'80 m',     emoji:'💥' },
-  { id:'r5', type:'run',     label:'Run 5',          detail:'1 km',         emoji:'🏃' },
-  { id:'s5', type:'station', label:'Rowing',          detail:'1,000 m',      emoji:'🚣' },
-  { id:'r6', type:'run',     label:'Run 6',          detail:'1 km',         emoji:'🏃' },
-  { id:'s6', type:'station', label:'Farmers Carry',   detail:'200 m · 2×16 kg (open)', emoji:'🏋️' },
-  { id:'r7', type:'run',     label:'Run 7',          detail:'1 km',         emoji:'🏃' },
-  { id:'s7', type:'station', label:'Sandbag Lunges',  detail:'100 m · 10 kg (open)',  emoji:'🎒' },
-  { id:'r8', type:'run',     label:'Run 8',          detail:'1 km',         emoji:'🏃' },
-  { id:'s8', type:'station', label:'Wall Balls',      detail:'100 reps · 4 kg (open)', emoji:'🏀' },
+  { id:'r1', type:'run',     label:'Run 1',             detail:'1 km (together)',                emoji:'🏃‍♀️' },
+  { id:'s1', type:'station', label:'SkiErg',             detail:'1,000 m total (alternate)',       emoji:'⛷️'  },
+  { id:'r2', type:'run',     label:'Run 2',             detail:'1 km (together)',                emoji:'🏃‍♀️' },
+  { id:'s2', type:'station', label:'Sled Push',          detail:'50 m · 102 kg (alternate)',      emoji:'🛷'  },
+  { id:'r3', type:'run',     label:'Run 3',             detail:'1 km (together)',                emoji:'🏃‍♀️' },
+  { id:'s3', type:'station', label:'Sled Pull',          detail:'50 m · 78 kg (alternate)',       emoji:'🧲'  },
+  { id:'r4', type:'run',     label:'Run 4',             detail:'1 km (together)',                emoji:'🏃‍♀️' },
+  { id:'s4', type:'station', label:'Burpee Broad Jumps', detail:'80 m total (alternate)',         emoji:'💥'  },
+  { id:'r5', type:'run',     label:'Run 5',             detail:'1 km (together)',                emoji:'🏃‍♀️' },
+  { id:'s5', type:'station', label:'Rowing',             detail:'1,000 m total (alternate)',      emoji:'🚣'  },
+  { id:'r6', type:'run',     label:'Run 6',             detail:'1 km (together)',                emoji:'🏃‍♀️' },
+  { id:'s6', type:'station', label:'Farmers Carry',      detail:'200 m · 2×16 kg (alternate)',   emoji:'🏋️'  },
+  { id:'r7', type:'run',     label:'Run 7',             detail:'1 km (together)',                emoji:'🏃‍♀️' },
+  { id:'s7', type:'station', label:'Sandbag Lunges',     detail:'100 m · 10 kg (alternate)',     emoji:'🎒'  },
+  { id:'r8', type:'run',     label:'Run 8',             detail:'1 km (together)',                emoji:'🏃‍♀️' },
+  { id:'s8', type:'station', label:'Wall Balls',         detail:'100 reps · 4 kg (alternate)',   emoji:'🏀'  },
 ];
 
-// Women's typical split suggestions (mm:ss)
+// Quick-fill suggestions for Women's Doubles
 const SUGGESTIONS = {
   run:     ['5:00','5:30','6:00','6:30','7:00'],
-  station: ['4:00','5:00','6:00','7:00','8:00'],
+  station: ['3:30','4:30','5:30','6:30','8:00'],
 };
 
-// ─── State ─────────────────────────────────────────────────────────────────
-let currentRacer = 'rebecca';
-let state = {
-  rebecca: {},
-  dani: {}
-};
+// ── State ────────────────────────────────────────────────────────────────────
+let splits = {};
 
-// Load from localStorage
 function loadState() {
   try {
-    const saved = localStorage.getItem('hyrox_state');
-    if (saved) state = JSON.parse(saved);
-  } catch(e) {}
-  // Guard against missing/corrupt racer keys
-  if (!state.rebecca || typeof state.rebecca !== 'object') state.rebecca = {};
-  if (!state.dani    || typeof state.dani    !== 'object') state.dani    = {};
+    const saved = localStorage.getItem('hyrox_team_splits');
+    if (saved) splits = JSON.parse(saved);
+    if (!splits || typeof splits !== 'object') splits = {};
+  } catch(e) { splits = {}; }
 }
 
 function saveState() {
-  localStorage.setItem('hyrox_state', JSON.stringify(state));
+  localStorage.setItem('hyrox_team_splits', JSON.stringify(splits));
 }
 
-function getRacerData() { return state[currentRacer]; }
-
-// ─── Helpers ───────────────────────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────────────────
 function parseTime(str) {
-  // accepts m:ss, mm:ss, h:mm:ss
   if (!str || !str.trim()) return null;
-  str = str.trim().replace(/[^0-9:]/g,'');
+  // strip non-numeric except colon
+  str = str.trim().replace(/[^0-9:]/g, '');
+  if (!str) return null;
   const parts = str.split(':').map(Number);
   if (parts.some(isNaN)) return null;
-  if (parts.length === 2) return parts[0] * 60 + parts[1];
-  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  if (parts.length === 2) {
+    const secs = parts[0] * 60 + parts[1];
+    return secs > 0 ? secs : null;
+  }
+  if (parts.length === 3) {
+    const secs = parts[0] * 3600 + parts[1] * 60 + parts[2];
+    return secs > 0 ? secs : null;
+  }
   return null;
 }
 
 function formatTime(secs) {
-  if (secs == null || isNaN(secs)) return '—';
+  if (secs == null || isNaN(secs) || secs < 0) return '—';
   const h = Math.floor(secs / 3600);
   const m = Math.floor((secs % 3600) / 60);
   const s = Math.floor(secs % 60);
@@ -297,68 +276,61 @@ function formatTime(secs) {
   return `${m}:${String(s).padStart(2,'0')}`;
 }
 
-// ─── Render ────────────────────────────────────────────────────────────────
+// ── Render ───────────────────────────────────────────────────────────────────
 function render() {
-  const data = getRacerData();
   const list = document.getElementById('splits-list');
   list.innerHTML = '';
 
-  let totalDone = 0;
-  let totalElapsed = 0;
-  let runTotal = 0, stationTotal = 0;
-  let runCount = 0, stationCount = 0;
+  let totalDone = 0, totalElapsed = 0;
+  let runTotal = 0, runCount = 0;
+  let stationTotal = 0, stationCount = 0;
 
   SEGMENTS.forEach((seg, i) => {
-    const secs = data[seg.id] != null ? data[seg.id] : null;
+    const secs = splits[seg.id] != null ? splits[seg.id] : null;
     if (secs != null) {
       totalDone++;
       totalElapsed += secs;
-      if (seg.type === 'run') { runTotal += secs; runCount++; }
-      else { stationTotal += secs; stationCount++; }
+      if (seg.type === 'run')     { runTotal += secs;     runCount++; }
+      else                         { stationTotal += secs; stationCount++; }
     }
 
-    // Build item
     const item = document.createElement('div');
     item.className = 'split-item';
-    item.id = `item-${seg.id}`;
 
     const timeDisplay = secs != null
       ? `<span class="split-time-display done">${formatTime(secs)}</span>`
       : `<span class="split-time-display empty">—</span>`;
 
-    const chevron = `<span class="split-chevron" id="chev-${seg.id}">▼</span>`;
-
     item.innerHTML = `
       <div class="split-header ${seg.type}" onclick="togglePanel('${seg.id}')">
-        <div class="split-num ${seg.type}">${i+1}</div>
+        <div class="split-num ${seg.type}">${i + 1}</div>
         <div class="split-label">
           <div class="split-name">${seg.emoji} ${seg.label}</div>
           <div class="split-detail">${seg.detail}</div>
         </div>
         ${timeDisplay}
-        ${chevron}
+        <span class="split-chevron" id="chev-${seg.id}">▼</span>
       </div>
       <div class="split-input-panel" id="panel-${seg.id}">
-        <div class="input-row">
-          <div class="input-group">
-            <label>Split time (mm:ss)</label>
-            <input
-              type="text" class="time-input"
-              id="inp-${seg.id}"
-              placeholder="${seg.type === 'run' ? '6:00' : '5:30'}"
-              value="${secs != null ? formatTime(secs) : ''}"
-              onkeydown="if(event.key==='Enter') setSplit('${seg.id}')"
-            />
-            <div class="input-hint">Type mm:ss e.g. 5:42</div>
-          </div>
+        <div class="input-group">
+          <label>Split time (m:ss or mm:ss)</label>
+          <input
+            type="text" class="time-input"
+            id="inp-${seg.id}"
+            placeholder="${seg.type === 'run' ? '6:00' : '5:30'}"
+            value="${secs != null ? formatTime(secs) : ''}"
+            autocomplete="off" autocorrect="off" spellcheck="false"
+            onkeydown="if(event.key==='Enter') setSplit('${seg.id}')"
+          />
+          <div class="input-hint">Type the time, e.g. 5:42 — then tap Set</div>
         </div>
         <div class="pace-row">
           ${(seg.type === 'run' ? SUGGESTIONS.run : SUGGESTIONS.station).map(t =>
             `<span class="pace-chip" onclick="fillSuggestion('${seg.id}','${t}')">${t}</span>`
           ).join('')}
         </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn-set" onclick="setSplit('${seg.id}')">Set Split</button>
+        <div class="btn-row">
+          <button class="btn-set" onclick="setSplit('${seg.id}')">✓ Set Split</button>
           ${secs != null ? `<button class="btn-clear" onclick="clearSplit('${seg.id}')">Clear</button>` : ''}
         </div>
       </div>
@@ -366,8 +338,8 @@ function render() {
     list.appendChild(item);
   });
 
-  // Summary bar
-  document.getElementById('sum-elapsed').textContent = formatTime(totalElapsed);
+  // Summary
+  document.getElementById('sum-elapsed').textContent = totalElapsed > 0 ? formatTime(totalElapsed) : '0:00';
   document.getElementById('sum-done').textContent = `${totalDone} / 16`;
 
   // Progress
@@ -379,86 +351,86 @@ function render() {
   const proj = document.getElementById('projection');
   if (totalDone > 0) {
     proj.style.display = 'block';
-
-    let estFinish = totalElapsed;
-
-    // Estimate remaining using averages
-    const avgRun = runCount > 0 ? runTotal / runCount : 6 * 60;
+    const avgRun     = runCount     > 0 ? runTotal     / runCount     : 6 * 60;
     const avgStation = stationCount > 0 ? stationTotal / stationCount : 5 * 60;
-
-    SEGMENTS.forEach((seg) => {
-      const secs = data[seg.id];
-      if (secs == null) {
+    let estFinish = totalElapsed;
+    SEGMENTS.forEach(seg => {
+      if (splits[seg.id] == null) {
         estFinish += seg.type === 'run' ? avgRun : avgStation;
       }
     });
-
     document.getElementById('proj-finish').textContent = formatTime(estFinish);
-    document.getElementById('sum-finish').textContent = formatTime(estFinish);
-    document.getElementById('proj-run-total').textContent = formatTime(runTotal + (8 - runCount) * avgRun);
-    document.getElementById('proj-station-total').textContent = formatTime(stationTotal + (8 - stationCount) * avgStation);
-    document.getElementById('proj-avg-km').textContent = runCount > 0 ? formatTime(avgRun) + '/km' : '—';
+    document.getElementById('sum-finish').textContent  = formatTime(estFinish);
+    const projRunTotal     = runTotal     + (8 - runCount)     * avgRun;
+    const projStationTotal = stationTotal + (8 - stationCount) * avgStation;
+    document.getElementById('proj-run-total').textContent     = formatTime(projRunTotal);
+    document.getElementById('proj-station-total').textContent = formatTime(projStationTotal);
+    document.getElementById('proj-avg-km').textContent        = formatTime(avgRun) + '/km';
+    const remaining = 16 - totalDone;
+    document.getElementById('proj-note').textContent = remaining > 0
+      ? `Based on ${totalDone} actual split${totalDone !== 1 ? 's' : ''} · ${remaining} remaining estimated`
+      : '🎉 Race complete!';
   } else {
     proj.style.display = 'none';
     document.getElementById('sum-finish').textContent = '—';
   }
 }
 
-// ─── Actions ───────────────────────────────────────────────────────────────
+// ── Actions ──────────────────────────────────────────────────────────────────
 function togglePanel(id) {
   const panel = document.getElementById(`panel-${id}`);
-  const chev = document.getElementById(`chev-${id}`);
+  const chev  = document.getElementById(`chev-${id}`);
   const isOpen = panel.classList.contains('open');
-  // Close all
   document.querySelectorAll('.split-input-panel').forEach(p => p.classList.remove('open'));
   document.querySelectorAll('.split-chevron').forEach(c => c.classList.remove('open'));
   if (!isOpen) {
     panel.classList.add('open');
     chev.classList.add('open');
-    setTimeout(() => document.getElementById(`inp-${id}`)?.focus(), 50);
+    setTimeout(() => document.getElementById(`inp-${id}`)?.focus(), 60);
   }
 }
 
 function fillSuggestion(id, val) {
   const inp = document.getElementById(`inp-${id}`);
-  if (inp) inp.value = val;
+  if (inp) { inp.value = val; inp.focus(); }
 }
 
 function setSplit(id) {
-  const inp = document.getElementById(`inp-${id}`);
+  const inp  = document.getElementById(`inp-${id}`);
   const secs = parseTime(inp.value);
-  if (secs == null || secs <= 0) {
+  if (!secs) {
     inp.style.borderColor = 'var(--red)';
-    setTimeout(() => inp.style.borderColor = '', 1000);
+    inp.style.transition  = 'border-color 0.1s';
+    setTimeout(() => { inp.style.borderColor = ''; inp.style.transition = ''; }, 800);
     return;
   }
-  getRacerData()[id] = secs;
+  splits[id] = secs;
   saveState();
   render();
+  // Auto-close and scroll to next unsplit segment
+  setTimeout(() => {
+    const nextIdx = SEGMENTS.findIndex(s => splits[s.id] == null);
+    if (nextIdx !== -1) {
+      const items = document.querySelectorAll('.split-item');
+      items[nextIdx]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, 100);
 }
 
 function clearSplit(id) {
-  delete getRacerData()[id];
+  delete splits[id];
   saveState();
   render();
 }
 
-function switchRacer(name) {
-  currentRacer = name;
-  document.querySelectorAll('.racer-tab').forEach((t, i) => {
-    t.classList.toggle('active', (i === 0) === (name === 'rebecca'));
-  });
-  render();
-}
-
-function resetRacer() {
-  if (!confirm(`Reset all splits for ${currentRacer}?`)) return;
-  state[currentRacer] = {};
+function resetAll() {
+  if (!confirm('Reset all splits? This will clear the whole race.')) return;
+  splits = {};
   saveState();
   render();
 }
 
-// ─── Init ──────────────────────────────────────────────────────────────────
+// ── Init ─────────────────────────────────────────────────────────────────────
 loadState();
 render();
 </script>
