@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hyrox Split Calculator 🏋️</title>
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --card: #1a1a22;
+      --border: #2a2a38;
+      --accent: #f5a623;
+      --green: #4caf82;
+      --red: #e05a5a;
+      --blue: #5b9cf6;
+      --text1: #f0f0f5;
+      --text2: #9090aa;
+      --text3: #5a5a78;
+      --run-bg: #1a1f2e;
+      --station-bg: #1e1a2e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text1);
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px 0 24px;
+    }
+    header h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+    header .sub { color: var(--text2); font-size: 13px; margin-top: 4px; }
+    .racer-tabs {
+      display: flex; gap: 8px; margin-bottom: 20px; justify-content: center;
+    }
+    .racer-tab {
+      padding: 8px 20px; border-radius: 20px; border: 1.5px solid var(--border);
+      background: var(--card); color: var(--text2); font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .racer-tab.active {
+      border-color: var(--accent); color: var(--accent); background: #2a2010;
+    }
+
+    /* Summary bar */
+    .summary-bar {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 16px 20px; margin-bottom: 20px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    }
+    .sum-item { text-align: center; }
+    .sum-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .sum-value { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .sum-value.accent { color: var(--accent); }
+    .sum-value.green { color: var(--green); }
+    .sum-value.blue { color: var(--blue); }
+
+    /* Progress bar */
+    .progress-wrap { margin-bottom: 20px; }
+    .progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.3s; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); margin-top: 5px; }
+
+    /* Split list */
+    .splits { display: flex; flex-direction: column; gap: 8px; }
+    .split-item {
+      border-radius: 12px; border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .split-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px;
+      cursor: pointer;
+    }
+    .split-header.run { background: var(--run-bg); }
+    .split-header.station { background: var(--station-bg); }
+    .split-num {
+      width: 24px; height: 24px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; flex-shrink: 0;
+    }
+    .split-num.run { background: #1e3055; color: var(--blue); }
+    .split-num.station { background: #2a1e45; color: #a78bfa; }
+    .split-label { flex: 1; }
+    .split-name { font-size: 14px; font-weight: 600; }
+    .split-detail { font-size: 11px; color: var(--text2); margin-top: 1px; }
+    .split-time-display {
+      font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums;
+      min-width: 60px; text-align: right; color: var(--text1);
+    }
+    .split-time-display.done { color: var(--green); }
+    .split-time-display.empty { color: var(--text3); }
+    .split-chevron { color: var(--text3); font-size: 12px; margin-left: 4px; transition: transform 0.2s; }
+    .split-chevron.open { transform: rotate(180deg); }
+
+    /* Input panel */
+    .split-input-panel {
+      display: none; padding: 12px 14px 14px;
+      border-top: 1px solid var(--border);
+      background: #13131a;
+    }
+    .split-input-panel.open { display: block; }
+    .input-row { display: flex; gap: 8px; align-items: center; }
+    .input-group { flex: 1; }
+    .input-group label { font-size: 11px; color: var(--text2); display: block; margin-bottom: 4px; }
+    .time-input {
+      width: 100%; padding: 10px 12px; background: var(--card);
+      border: 1.5px solid var(--border); border-radius: 8px;
+      color: var(--text1); font-size: 16px; font-weight: 600;
+      font-variant-numeric: tabular-nums; text-align: center;
+      outline: none; transition: border-color 0.15s;
+    }
+    .time-input:focus { border-color: var(--accent); }
+    .time-input::placeholder { color: var(--text3); }
+    .btn-set {
+      padding: 10px 16px; background: var(--accent); color: #000;
+      border: none; border-radius: 8px; font-weight: 700; font-size: 14px;
+      cursor: pointer; margin-top: 20px; white-space: nowrap;
+    }
+    .btn-clear {
+      padding: 10px 12px; background: transparent; color: var(--text3);
+      border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px;
+      cursor: pointer; margin-top: 20px;
+    }
+    .input-hint { font-size: 11px; color: var(--text3); margin-top: 6px; }
+
+    /* Projection section */
+    .projection {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px 20px; margin-top: 20px;
+    }
+    .proj-title { font-size: 12px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
+    .proj-finish {
+      font-size: 36px; font-weight: 800; color: var(--accent);
+      font-variant-numeric: tabular-nums; text-align: center;
+      margin: 8px 0;
+    }
+    .proj-breakdown { display: flex; justify-content: space-around; margin-top: 12px; }
+    .proj-sub { text-align: center; }
+    .proj-sub-val { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .proj-sub-label { font-size: 10px; color: var(--text2); margin-top: 2px; }
+
+    /* Reset button */
+    .btn-reset {
+      display: block; width: 100%; margin-top: 20px;
+      padding: 12px; background: transparent; color: var(--text3);
+      border: 1px solid var(--border); border-radius: 10px;
+      font-size: 13px; cursor: pointer; text-align: center;
+    }
+
+    /* Pace estimates */
+    .pace-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .pace-chip {
+      font-size: 11px; padding: 3px 8px; border-radius: 10px;
+      background: #1f1f2e; border: 1px solid var(--border); color: var(--text2);
+      cursor: pointer;
+    }
+    .pace-chip:hover { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🏋️ Hyrox Split Calculator</h1>
+  <div class="sub">Live split tracker & finish time estimator</div>
+</header>
+
+<div class="racer-tabs">
+  <button class="racer-tab active" onclick="switchRacer('rebecca')">💜 Rebecca</button>
+  <button class="racer-tab" onclick="switchRacer('dani')">🧡 Dani</button>
+</div>
+
+<div class="summary-bar">
+  <div class="sum-item">
+    <div class="sum-label">Elapsed</div>
+    <div class="sum-value blue" id="sum-elapsed">0:00</div>
+  </div>
+  <div class="sum-item">
+    <div class="sum-label">Splits Done</div>
+    <div class="sum-value accent" id="sum-done">0 / 16</div>
+  </div>
+  <div class="sum-item">
+    <div class="sum-label">Est. Finish</div>
+    <div class="sum-value green" id="sum-finish">—</div>
+  </div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+  <div class="progress-label">
+    <span>Start</span>
+    <span id="progress-pct">0%</span>
+    <span>Finish</span>
+  </div>
+</div>
+
+<div class="splits" id="splits-list"></div>
+
+<div class="projection" id="projection" style="display:none">
+  <div class="proj-title">📊 Estimated Finish</div>
+  <div class="proj-finish" id="proj-finish">—</div>
+  <div class="proj-breakdown">
+    <div class="proj-sub">
+      <div class="proj-sub-val" id="proj-run-total">—</div>
+      <div class="proj-sub-label">Total Run Time</div>
+    </div>
+    <div class="proj-sub">
+      <div class="proj-sub-val" id="proj-station-total">—</div>
+      <div class="proj-sub-label">Total Station Time</div>
+    </div>
+    <div class="proj-sub">
+      <div class="proj-sub-val" id="proj-avg-km">—</div>
+      <div class="proj-sub-label">Avg Run Pace/km</div>
+    </div>
+  </div>
+</div>
+
+<button class="btn-reset" onclick="resetRacer()">🔄 Reset splits for this racer</button>
+
+<script>
+// ─── Hyrox structure ───────────────────────────────────────────────────────
+// Format: 8× (1km run + station). 16 splits total.
+const SEGMENTS = [
+  { id:'r1', type:'run',     label:'Run 1',          detail:'1 km',         emoji:'🏃' },
+  { id:'s1', type:'station', label:'SkiErg',          detail:'1,000 m',      emoji:'⛷️' },
+  { id:'r2', type:'run',     label:'Run 2',          detail:'1 km',         emoji:'🏃' },
+  { id:'s2', type:'station', label:'Sled Push',       detail:'50 m',         emoji:'🛷' },
+  { id:'r3', type:'run',     label:'Run 3',          detail:'1 km',         emoji:'🏃' },
+  { id:'s3', type:'station', label:'Sled Pull',       detail:'50 m',         emoji:'🧲' },
+  { id:'r4', type:'run',     label:'Run 4',          detail:'1 km',         emoji:'🏃' },
+  { id:'s4', type:'station', label:'Burpee Broad Jumps', detail:'80 m',     emoji:'💥' },
+  { id:'r5', type:'run',     label:'Run 5',          detail:'1 km',         emoji:'🏃' },
+  { id:'s5', type:'station', label:'Rowing',          detail:'1,000 m',      emoji:'🚣' },
+  { id:'r6', type:'run',     label:'Run 6',          detail:'1 km',         emoji:'🏃' },
+  { id:'s6', type:'station', label:'Farmers Carry',   detail:'200 m',        emoji:'🏋️' },
+  { id:'r7', type:'run',     label:'Run 7',          detail:'1 km',         emoji:'🏃' },
+  { id:'s7', type:'station', label:'Sandbag Lunges',  detail:'100 m',        emoji:'🎒' },
+  { id:'r8', type:'run',     label:'Run 8',          detail:'1 km',         emoji:'🏃' },
+  { id:'s8', type:'station', label:'Wall Balls',      detail:'100 reps',     emoji:'🏀' },
+];
+
+// Women's typical split suggestions (mm:ss)
+const SUGGESTIONS = {
+  run:     ['5:00','5:30','6:00','6:30','7:00'],
+  station: ['4:00','5:00','6:00','7:00','8:00'],
+};
+
+// ─── State ─────────────────────────────────────────────────────────────────
+let currentRacer = 'rebecca';
+let state = {
+  rebecca: {},
+  dani: {}
+};
+
+// Load from localStorage
+function loadState() {
+  try {
+    const saved = localStorage.getItem('hyrox_state');
+    if (saved) state = JSON.parse(saved);
+  } catch(e) {}
+}
+
+function saveState() {
+  localStorage.setItem('hyrox_state', JSON.stringify(state));
+}
+
+function getRacerData() { return state[currentRacer]; }
+
+// ─── Helpers ───────────────────────────────────────────────────────────────
+function parseTime(str) {
+  // accepts m:ss, mm:ss, h:mm:ss
+  if (!str || !str.trim()) return null;
+  str = str.trim().replace(/[^0-9:]/g,'');
+  const parts = str.split(':').map(Number);
+  if (parts.some(isNaN)) return null;
+  if (parts.length === 2) return parts[0] * 60 + parts[1];
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  return null;
+}
+
+function formatTime(secs) {
+  if (secs == null || isNaN(secs)) return '—';
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = Math.floor(secs % 60);
+  if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+// ─── Render ────────────────────────────────────────────────────────────────
+function render() {
+  const data = getRacerData();
+  const list = document.getElementById('splits-list');
+  list.innerHTML = '';
+
+  let totalDone = 0;
+  let totalElapsed = 0;
+  let runTotal = 0, stationTotal = 0;
+  let runCount = 0, stationCount = 0;
+
+  SEGMENTS.forEach((seg, i) => {
+    const secs = data[seg.id] != null ? data[seg.id] : null;
+    if (secs != null) {
+      totalDone++;
+      totalElapsed += secs;
+      if (seg.type === 'run') { runTotal += secs; runCount++; }
+      else { stationTotal += secs; stationCount++; }
+    }
+
+    // Build item
+    const item = document.createElement('div');
+    item.className = 'split-item';
+    item.id = `item-${seg.id}`;
+
+    const timeDisplay = secs != null
+      ? `<span class="split-time-display done">${formatTime(secs)}</span>`
+      : `<span class="split-time-display empty">—</span>`;
+
+    const chevron = `<span class="split-chevron" id="chev-${seg.id}">▼</span>`;
+
+    item.innerHTML = `
+      <div class="split-header ${seg.type}" onclick="togglePanel('${seg.id}')">
+        <div class="split-num ${seg.type}">${i+1}</div>
+        <div class="split-label">
+          <div class="split-name">${seg.emoji} ${seg.label}</div>
+          <div class="split-detail">${seg.detail}</div>
+        </div>
+        ${timeDisplay}
+        ${chevron}
+      </div>
+      <div class="split-input-panel" id="panel-${seg.id}">
+        <div class="input-row">
+          <div class="input-group">
+            <label>Split time (mm:ss)</label>
+            <input
+              type="text" class="time-input"
+              id="inp-${seg.id}"
+              placeholder="${seg.type === 'run' ? '6:00' : '5:30'}"
+              value="${secs != null ? formatTime(secs) : ''}"
+              inputmode="numeric"
+              onkeydown="if(event.key==='Enter') setSplit('${seg.id}')"
+            />
+            <div class="input-hint">Type mm:ss e.g. 5:42</div>
+          </div>
+        </div>
+        <div class="pace-row">
+          ${(seg.type === 'run' ? SUGGESTIONS.run : SUGGESTIONS.station).map(t =>
+            `<span class="pace-chip" onclick="fillSuggestion('${seg.id}','${t}')">${t}</span>`
+          ).join('')}
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-set" onclick="setSplit('${seg.id}')">Set Split</button>
+          ${secs != null ? `<button class="btn-clear" onclick="clearSplit('${seg.id}')">Clear</button>` : ''}
+        </div>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+
+  // Summary bar
+  document.getElementById('sum-elapsed').textContent = formatTime(totalElapsed);
+  document.getElementById('sum-done').textContent = `${totalDone} / 16`;
+
+  // Progress
+  const pct = Math.round(totalDone / 16 * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+
+  // Projection
+  const proj = document.getElementById('projection');
+  if (totalDone > 0) {
+    proj.style.display = 'block';
+
+    const remaining = 16 - totalDone;
+    let estFinish = totalElapsed;
+
+    // Estimate remaining using averages
+    const avgRun = runCount > 0 ? runTotal / runCount : 6 * 60;
+    const avgStation = stationCount > 0 ? stationTotal / stationCount : 5 * 60;
+
+    SEGMENTS.forEach((seg) => {
+      const secs = data[seg.id];
+      if (secs == null) {
+        estFinish += seg.type === 'run' ? avgRun : avgStation;
+      }
+    });
+
+    document.getElementById('proj-finish').textContent = formatTime(estFinish);
+    document.getElementById('sum-finish').textContent = formatTime(estFinish);
+    document.getElementById('proj-run-total').textContent = formatTime(runTotal + (8 - runCount) * avgRun);
+    document.getElementById('proj-station-total').textContent = formatTime(stationTotal + (8 - stationCount) * avgStation);
+    document.getElementById('proj-avg-km').textContent = runCount > 0 ? formatTime(avgRun) + '/km' : '—';
+  } else {
+    proj.style.display = 'none';
+    document.getElementById('sum-finish').textContent = '—';
+  }
+}
+
+// ─── Actions ───────────────────────────────────────────────────────────────
+function togglePanel(id) {
+  const panel = document.getElementById(`panel-${id}`);
+  const chev = document.getElementById(`chev-${id}`);
+  const isOpen = panel.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.split-input-panel').forEach(p => p.classList.remove('open'));
+  document.querySelectorAll('.split-chevron').forEach(c => c.classList.remove('open'));
+  if (!isOpen) {
+    panel.classList.add('open');
+    chev.classList.add('open');
+    setTimeout(() => document.getElementById(`inp-${id}`)?.focus(), 50);
+  }
+}
+
+function fillSuggestion(id, val) {
+  const inp = document.getElementById(`inp-${id}`);
+  if (inp) inp.value = val;
+}
+
+function setSplit(id) {
+  const inp = document.getElementById(`inp-${id}`);
+  const secs = parseTime(inp.value);
+  if (secs == null || secs <= 0) {
+    inp.style.borderColor = 'var(--red)';
+    setTimeout(() => inp.style.borderColor = '', 1000);
+    return;
+  }
+  getRacerData()[id] = secs;
+  saveState();
+  render();
+}
+
+function clearSplit(id) {
+  delete getRacerData()[id];
+  saveState();
+  render();
+}
+
+function switchRacer(name) {
+  currentRacer = name;
+  document.querySelectorAll('.racer-tab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0) === (name === 'rebecca'));
+  });
+  render();
+}
+
+function resetRacer() {
+  if (!confirm(`Reset all splits for ${currentRacer}?`)) return;
+  state[currentRacer] = {};
+  saveState();
+  render();
+}
+
+// ─── Init ──────────────────────────────────────────────────────────────────
+loadState();
+render();
+</script>
+</body>
+</html>
